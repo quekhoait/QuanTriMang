@@ -11,8 +11,7 @@ export const AllFileComponent = () => {
   { name: "From:  SM-A325F", date: "Jun 25,2024", type: "folder" },
   { name: "SổtayBắtđầuTeraBox.pdf", date: "Jun 25,2024", size: "44.38MB", type: "pdf" },
 ];
-  return (
-  
+  return (  
     <div>
       <FilePageComponent 
         listFiles={files}

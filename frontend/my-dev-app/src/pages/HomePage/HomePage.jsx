@@ -13,9 +13,9 @@ const HomePage = ({event}) => {
     setOpenItem(itemName);
   };
   return (
-    <div>
+    <div className="h-screen">
       <NavbarComponent />
-      <div className="flex justify-center pt-[12px]">
+      <div className="flex justify-center pt-[100px] h-screen">
         <div className="row w-[90%]">
           <div className="col-3 w-[20%]">
             <NavMenuComponent openItem={openItem} onChangeItem={handleChange}/>
