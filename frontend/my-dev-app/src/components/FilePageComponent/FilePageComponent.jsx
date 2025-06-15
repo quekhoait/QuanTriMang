@@ -77,7 +77,7 @@ export default function FilePageComponent({listFiles, isAllFile, fileName}) {
     <thead className="sticky top-0 bg-white z-10">
       <tr className="border-b">
         <th className="p-2 text-blue-700 w-8">
-          <input type="checkbox" 
+          <input type="checkbox" checked={selectRow.length === listFils.length}
             onChange={(e)=>handleAllSelect(e.target.checked)}
           />
         </th>
