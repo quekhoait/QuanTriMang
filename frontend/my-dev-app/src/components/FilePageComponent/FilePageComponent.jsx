@@ -88,6 +88,8 @@ export default function FilePageComponent({listFiles, isAllFile, fileName}) {
 
       {isCreating &&
         <tr className="border-b hover:bg-gray-100">
+          <td><input type="checkbox"
+              /></td>
           <td className="p-2 flex items-center space-x-2">
             <FaFolder className="text-yellow-500" />
             <input 

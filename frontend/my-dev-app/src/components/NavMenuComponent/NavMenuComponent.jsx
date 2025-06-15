@@ -22,7 +22,7 @@ const NavMenuComponent = ({openItem, onChangeItem}) => {
       <MenuItemComponent 
           fileName = {"Video"}
           img = {FaPhotoVideo}
-          // onClick = {()=>handleChange('Video')}
+          onClick = {()=>onChangeItem('Video')}
           flag={openItem === 'Video'}
       />
       <MenuItemComponent 
