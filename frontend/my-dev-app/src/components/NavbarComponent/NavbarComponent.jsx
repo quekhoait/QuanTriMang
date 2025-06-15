@@ -5,7 +5,7 @@ const NavbarComponent = () => {
     const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white py-[16px]  w-[100%] flex items-center justify-center shadow-md ">
+    <div className="bg-white py-[16px]  w-[100%] flex items-center justify-center shadow-md fixed">
       <nav className="flex items-center justify-between w-[90%]">
         <div className="flex items-center w-[40%] justify-between">
           <div className="flex items-center space-x-2">
