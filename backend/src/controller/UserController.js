@@ -65,7 +65,12 @@ const loginUser = async(req, res)=>{
   }
 }
 
+const getUser  =async(req, res)=>{
+  const id = pa
+}
+
 module.exports = {
     createUser,
-    loginUser
+    loginUser,
+    getUser
 }

@@ -63,8 +63,15 @@ const loginUser =(user)=>{
   })
 }
 
+const getUser = async(req, res)=>{
+  return new Promise(async(resolve, reject)=>{
+    
+  })
+}
+
 
 module.exports = {
   createUser,
-  loginUser
+  loginUser,
+  getUser
 };
