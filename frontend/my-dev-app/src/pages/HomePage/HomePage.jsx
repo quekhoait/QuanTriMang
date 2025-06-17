@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import NavbarComponent from '../../components/NavbarComponent/NavbarComponent';
 import NavMenuComponent from '../../components/NavMenuComponent/NavMenuComponent'
-import { FaRegFileAlt, FaRegImage, FaMusic } from "react-icons/fa";
+// import { FaRegFileAlt, FaRegImage, FaMusic } from "react-icons/fa";
 import { AllFileComponent } from '../../components/AllFileComponent/AllFileComponent';
 import ImageComponent from '../../components/ImageComponent/ImageComponent';
 import VideoComponent from '../../components/VideoComponent/VideoComponent';
