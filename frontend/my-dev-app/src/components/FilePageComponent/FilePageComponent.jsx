@@ -208,7 +208,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
                   <td className={`p-2 text-blue-700 w-8 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:!opacity-100'} transition-opacity duration-200`}>
                     <input type="checkbox" checked={isSelected}
                       onChange={(e) => handleListSelect(file.name, e.target.checked)}
-                    />
+                     />
                   </td>
                   <td className="cursor-pointer p-2 flex items-center space-x-2">
                     {file.type === "folder" ? (
