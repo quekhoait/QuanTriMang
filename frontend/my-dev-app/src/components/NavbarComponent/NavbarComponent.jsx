@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import image from '../../assets/user.png'
+import { useUser } from '../../contexts/UserContext';
 
 const NavbarComponent = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);    
+    const {account, getUser} = useUser();
 
   return (
     <div className="bg-white py-[16px]  w-[100%] flex items-center justify-center shadow-md fixed">
@@ -34,7 +36,7 @@ const NavbarComponent = () => {
               alt="avatar"
               className="w-9 h-9 rounded-full cursor-pointer"
               />
-              <p className="text-blue-700 font-medium"  >user</p>
+              <p className="text-blue-700 font-medium" >{account?.data?.username}</p>
             </div>
             {isOpen && (
               <ul className="absolute right-[-20px] mt-2 w-40 bg-white border rounded-lg shadow-lg z-10">

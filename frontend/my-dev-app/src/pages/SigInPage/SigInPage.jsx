@@ -1,11 +1,46 @@
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
 import image from '../../assets/anhnen3.png';
+import { useState } from 'react';
+import { useUser } from '../../contexts/UserContext';
 
 export default function SignInPage() {
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const handlSigUp= ()=>{
-    navigator('/regis')
+    navigate('/account/regis')
   }
+  const [error, setError] = useState();
+
+  const [username, setUsername] = useState();
+  const [password, setPassword] = useState();
+    const { setAccessToken, setRefreshToken } = useUser();
+
+    const handleSubmitSigIn = async(e)=>{
+      e.preventDefault();
+      try{
+        const response = await fetch('http://localhost:5999/api/user/login', {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({username, password})
+        })
+        const data = await response.json();
+        if(response.ok){
+          alert("Đăng nhập thành công");
+          localStorage.setItem('accessToken', data.accessToken);
+        // localStorage.setItem('refreshToken', data.refreshToken);
+          setAccessToken(data.accessToken);
+          navigate('/homepage')
+        }else{
+          setError("Lỗi " + data.message)
+        }
+      }catch(err){;
+
+        alert("Lỗi server" + data.message);
+      }
+    }
+
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden bg-cover"
      style={{ backgroundImage: `url(${image})` }}>
@@ -18,16 +53,20 @@ export default function SignInPage() {
         <h2 className="text-2xl font-bold text-center text-white">
           Đăng nhập
         </h2>
-        <form className="space-y-2">
-          <div className="bg-red-300 rounded-md">
-             <label className="block mb-1 text-red-700 text-center px-3 py-2 text-lg font-medium">* Vui lòng nhập đầy đủ thông tin</label>
-          </div>
+        <form className="space-y-2" onSubmit={handleSubmitSigIn}>
+          {error && (
+                  <div className="bg-red-300 rounded-md">
+                    <label className="block mb-1 text-red-700 text-center px-3 py-2 text-lg font-medium">{error}</label>
+                  </div>
+                )}
           <div>
             <label className="block mb-1 text-white text-left">Tên đăng nhập</label>
             <input
               type="text"
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400"
               placeholder="Nhập họ và tên"
+              value={username}
+              onChange={(e)=>setUsername(e.target.value)}
               required
             />
           </div>
@@ -37,6 +76,8 @@ export default function SignInPage() {
               type="password"
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
               placeholder="Nhập mật khẩu"
+              value={password}
+              onChange={(e)=>setPassword(e.target.value)}
               required
             />
             <i class="fa-regular fa-eye absolute top-[60%] right-4 cursor-pointer "></i>
