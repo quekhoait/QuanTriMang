@@ -26,10 +26,10 @@ export const AllFileComponent = () => {
 ];
 
   return (  
-  <FilePageComponent 
-              listFiles={files}
-              fileName={"All file"}
-              isAllFile={false}
-            />
+    <FilePageComponent 
+      listFiles={files}
+      fileName={"All file"}
+      isAllFile={false}
+    />
   )
 }

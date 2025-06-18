@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import NavbarComponent from '../../components/NavbarComponent/NavbarComponent';
 import NavMenuComponent from '../../components/NavMenuComponent/NavMenuComponent'
 // import { FaRegFileAlt, FaRegImage, FaMusic } from "react-icons/fa";
@@ -13,6 +13,8 @@ const HomePage = ({event}) => {
   const handleChange = (itemName) => {
     setOpenItem(itemName);
   };
+
+
   return (
     <div className="h-screen">
       <NavbarComponent />

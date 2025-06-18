@@ -1,13 +1,61 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import image from '../../assets/anhnen3.png';
 
 const SigUpPage = () => {
 
-    const navigator = useNavigate();
+    const navigate = useNavigate();
     const handleSigIn =()=>{
-        navigator('/login');
+        navigate('/account/login');
     }
+
+    const [error, setError] = useState();
+    const [username, setUsername] = useState();
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
+    const [confirmPassWord, setConfirmPassword] = useState();
+
+    const handleSubmitRegis = async(e)=>{
+      e.preventDefault();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      const isCheckEmail = emailRegex.test(email)
+      if(!isCheckEmail){
+        setError("*Email không hợp lệ!");
+        return
+    }
+      if(password.length < 6){
+        setError("*Mật khẩu cần nhiều hơn 6 ký tự!");
+        return
+      }
+      if(confirmPassWord.trim() !== password.trim()){
+        setError("*Mật khẩu xác nhận không khớp!");
+        return
+      }
+      setError('');
+      try{  
+        const response = await fetch("http://localhost:5999/api/user/create",{
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            username: username,
+            password: password
+          })
+        })
+        const data = await response.json();
+        if(response.ok){
+          alert("Đăng ký thành công");
+          navigate('/account/login')
+        }else{
+          setError(data.message)
+        }
+      }catch(err){
+        alert("Lỗi server"+ err.message)
+      }
+    }
+    
   return (
       <div className="relative flex items-center justify-center min-h-screen overflow-hidden bg-cover"
           style={{ backgroundImage: `url(${image})` }}>
@@ -20,17 +68,32 @@ const SigUpPage = () => {
              <h2 className="text-2xl font-bold text-center text-white">
                Đăng ký
              </h2>
-             <form className="space-y-2">
-                <div className="bg-red-300 rounded-md">
-                  <label className="block mb-1 text-red-700 text-center px-3 py-2 text-lg font-medium">* Vui lòng nhập đầy đủ thông tin</label>
-                </div>
-               <div>
-                 <label className="block mb-1 text-white text-left">Tên đăng nhập</label>
+             <form className="space-y-2" onSubmit={handleSubmitRegis}>
+                {error && (
+                  <div className="bg-red-300 rounded-md">
+                    <label className="block mb-1 text-red-700 text-center px-3 py-2 text-lg font-medium">{error}</label>
+                  </div>
+                )}
+                 <div>
+                 <label className="block mb-1 text-white text-left">Email</label>
                  <input
                    type="text"
                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400"
-                   placeholder="Nhập họ và tên"
+                   placeholder="Nhập email"
+                   value={email}
+                   onChange={(e)=>setEmail(e.target.value)}
                    required
+                 />
+               </div>
+               <div>
+                 <label className="block mb-1 text-white text-left">Tên đăng nhập</label>
+                 <input
+                    type="text"
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400"
+                    placeholder="Nhập họ và tên"
+                    value={username}
+                    onChange={(e)=>setUsername(e.target.value)}
+                    required
                  />
                </div>
                 <div className="relative">
@@ -39,6 +102,8 @@ const SigUpPage = () => {
                   type="password"
                   className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
                   placeholder="Nhập mật khẩu"
+                  value={password}
+                  onChange={(e)=>setPassword(e.target.value)}
                   required
                 />
                 <i class="fa-regular fa-eye absolute top-[60%] right-4 cursor-pointer "></i>
@@ -48,6 +113,8 @@ const SigUpPage = () => {
                   type="password"
                   className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
                   placeholder="Nhập mật khẩu"
+                  value={confirmPassWord}
+                  onChange={(e)=>setConfirmPassword(e.target.value)}
                   required
                 />
                 <i class="fa-regular fa-eye absolute top-[60%] right-4 cursor-pointer "></i>

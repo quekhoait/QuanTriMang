@@ -5,15 +5,15 @@ import SigUpPage from "../pages/SigUpPage/SigUpPage";
 
 export const routes = [
     {
-        path: "/",
+        path: "/homePage",
         page: HomePage
     },
     {
-        path: "/login",
+        path: "/account/login",
         page: SigInPage
     },
     {
-        path: "/regis",
+        path: "/account/regis",
         page: SigUpPage
     }
 ]
