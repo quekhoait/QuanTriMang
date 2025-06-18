@@ -1,32 +1,47 @@
 const { pool } = require("../../db");
+const bcrypt = require('bcrypt');
 
 const createUser = (newUser) => {
   return new Promise(async (resolve, reject) => {
     try {
       await pool.connect();
-      const checkUser = await pool
+      const checkEmailUser = await pool
+        .request()
+        .input("email", newUser.email)
+        .query("SELECT * FROM Account WHERE email = @email");
+
+      if (checkEmailUser.recordset.length > 0) {
+        resolve({
+          status: "ERR",
+          message: "Email đã tồn tại",
+        });
+      }
+
+      const checkUsername = await pool
         .request()
         .input("username", newUser.username)
         .query("SELECT * FROM Account WHERE username = @username");
 
-      if (checkUser.recordset.length > 0) {
-        resolve({
+      if (checkUsername.recordset.length > 0) {
+        return resolve({
           status: "ERR",
-          message: "Tên đã tồn tại",
+          message: "Tên user đã tồn tại",
         });
-      } else {
+      }
+      const hashPass = await bcrypt.hash(newUser.password, 10);
         await pool
           .request()
+          .input("email", newUser.email)
           .input("username", newUser.username)
           .input("password", newUser.password)
-          .query("INSERT INTO Account (username, password) VALUES (@username, @password)");
+          .query("INSERT INTO Account (email, username, password) VALUES (@email, @username, @password)");
 
-        resolve({
+        return resolve({
           status: "SUCCESS",
           message: newUser.message,
         });
       }
-    } catch (err) {
+    catch (err) {
       reject(err);
     }
   });
@@ -63,15 +78,75 @@ const loginUser =(user)=>{
   })
 }
 
-const getUser = async(req, res)=>{
+const getUser = (id)=>{
   return new Promise(async(resolve, reject)=>{
-    
+    try{
+      await pool.connect();
+      const user = await pool.request().input('id', id).query("Select * from Account Where id = @id");
+      if(user.recordset.length===0){
+        return resolve({
+          status: "ERR",
+          message: "Không tìm thấy"
+        })
+      } 
+      resolve({
+          status: "ok",
+          message: "Đã tìm thấy",
+          data: user.recordset[0]
+        })
+
+    }catch(err){
+      reject(err);
+    }
   })
+}
+
+const updateUser = (id, data)=>{
+    return new Promise(async(resolve, reject)=>{
+        try{
+            await pool.connect();
+            const user = await pool.request().input("id", id).query("Select * from Account Where id = @id")
+            if(user.recordset.length === 0){
+              return resolve({
+                status: "ERR",
+                message: "Không tìm thấy user"
+              })
+            }
+            const existingUser = user.recordset[0];
+            let passwordToUpdate = existingUser.password;
+            if(data.password){
+              passwordToUpdate = await bcrypt.hash(data.password, 10);
+            }
+            const updatedUser = await pool.request()
+            .input("id", id)
+            .input("username", data.username || existingUser.username)
+            .input("password", data.password || existingUser.password)
+            .input("avatar", data.avatar ||  existingUser.avatar)
+            .input("role", data.role || existingUser.role)
+            .input("email", data.email || existingUser.email)
+            .query(`UPDATE Account SET
+              username = @username,
+              email = @email,
+              password = @password,
+              avatar = @avatar,
+              role = @role
+          WHERE id = @id`)
+
+          resolve({
+              status: 'OK',
+              message: 'SUCCESS'
+          })
+        }catch(e){
+            console.error('Update User Error:', e); // 👈 thêm dòng này
+            reject(e)
+        }
+    })
 }
 
 
 module.exports = {
   createUser,
   loginUser,
-  getUser
+  getUser,
+  updateUser
 };

@@ -1,4 +1,5 @@
 const { pool } = require("../../db")
+const jwt = require('jsonwebtoken');
 const UserServices = require('../services/UserServices')
 const JwtServices = require("../services/jwtServices")
 
@@ -52,7 +53,11 @@ const loginUser = async(req, res)=>{
     }
     const accessToken = JwtServices.genneralAccesToken(userData);
     const refreshToken = JwtServices.genneralRefreshToken(userData);
-
+      res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false,
+            samesite:'strict'
+        })
     return res.status(200).json({
       status: "OK",
       message: "Đăng nhập thành công",
@@ -66,11 +71,56 @@ const loginUser = async(req, res)=>{
 }
 
 const getUser  =async(req, res)=>{
-  const id = pa
+  try{
+    const id = req.user.id;
+    const user = await UserServices.getUser(id);
+    return res.status(200).json(user);
+  }catch(err){
+    return res.status(404).json({message: err.message})
+  }
+}
+
+const refreshToken = async(req, res)=>{
+  try{
+    const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken)
+    if(!refreshToken) res.sendStatus(401);
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, data)=>{
+      if(err) res.sendStatus(403)
+        const accessToken = jwt.sign({id: data.id}, process.env.ACCESS_TOKEN,{expiresIn: '30s'})
+      res.json({accessToken})
+    })
+  }catch(err){
+    console.error('Refresh token verification error:', err.message);
+    return res.sendStatus(403);
+  }
+}
+
+const updateUser = async(req, res)=>{
+    try{
+        const userId = req.params.id
+        const data = req.body;
+        // const file = req.file;
+        // if(file){
+        //     data.avatar = `http://localhost:5999/uploads/avatar/${file.filename}`;
+        // }
+        if(!userId){
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Không tìm thấy user'
+            })
+        }
+        const user = await UserServices.updateUser(userId, data);
+        return res.status(200).json(user);
+    }catch(e){
+        return res.status(404).json({message:'Cập nhật thất bại'})
+    }
 }
 
 module.exports = {
     createUser,
     loginUser,
-    getUser
+    getUser,
+    refreshToken,
+    updateUser
 }
