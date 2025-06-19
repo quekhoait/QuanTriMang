@@ -4,17 +4,34 @@ const cloudinary = require('../../cloudinary.js');
 const dotenv = require('dotenv');
 dotenv.config();
 const createFile = async (req, res) => {
-    console.log(process.env.CLOUDINARY_CLOUD_NAME);
-    console.log(process.env.CLOUDINARY_API_KEY);
-    console.log(process.env.CLOUDINARY_API_SECRET);
-
-    
-    const userId = 1;
-    const parentFolderId = 0;
-    const isFolder = 0;
-    const updateDate = new Date();
+    const fileName = (req.file?.originalname || req.body.fileName)?.trim();
+    const fileSize = req.file?.size || 0;
+    const fileType = req.file?.mimetype || null;
+    const userId = parseInt(req.body.userId);
+    const parentFolderId = req.body.parentFolderId || null;
+    const isFolder = parseInt(req.body.isFolder) || 0;
+    const updateDate = null;
 
     try {
+        if (isFolder === 1) {
+            // 👈 Trường hợp tạo FOLDER, không upload Cloudinary
+            const newFolder = await FileService.createFile({
+                userId,
+                parentFolderId,
+                fileName,
+                fileSize: 0,
+                fileType: null,
+                isFolder,
+                keyPath: null,  // hoặc null nếu không dùng
+                publicId: null,
+                createDate: new Date(),
+                updateDate: null,
+            });
+
+            return res.json({ message: 'Tạo thư mục thành công!', file: newFolder });
+        }
+
+        // 👇 Trường hợp upload FILE
         const result = await new Promise((resolve, reject) => {
             streamifier.createReadStream(req.file.buffer).pipe(
                 cloudinary.uploader.upload_stream(
@@ -27,23 +44,23 @@ const createFile = async (req, res) => {
             );
         });
 
-        await FileService.createFile({
+        const newFile = await FileService.createFile({
             userId,
             parentFolderId,
-            fileName: req.file.originalname,
-            fileSize: req.file.size,
-            fileType: req.file.mimetype,
-            isFolder,
+            fileName,
+            fileSize,
+            fileType,
+            isFolder: 0,
             keyPath: result.secure_url,
             publicId: result.public_id,
             createDate: new Date(),
             updateDate,
         });
 
-        res.json({ message: 'Tải lên thành công!', file: result });
+        res.json({ message: 'Tải lên thành công!', file: newFile });
     } catch (error) {
         console.error('Lỗi tải lên:', error);
-        res.status(500).json({ error: 'Lỗi tải lên tệp tin.', info: error.message });
+        res.status(500).json({ error: 'Lỗi tải lên tệp tin/thư mục.', info: error.message });
     }
 };
 
