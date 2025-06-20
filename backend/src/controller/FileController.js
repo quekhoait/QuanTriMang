@@ -3,10 +3,12 @@ const streamifier = require('streamifier')
 const cloudinary = require('../../cloudinary.js');
 const dotenv = require('dotenv');
 dotenv.config();
+
+// tạo file và folder lưu dưới db và cloudinary
 const createFile = async (req, res) => {
     const fileName = (req.file?.originalname || req.body.fileName)?.trim();
     const fileSize = req.file?.size || 0;
-    const fileType = req.file?.mimetype || null;
+    const fileType = req.file?.mimetype.trim() || null;
     const userId = parseInt(req.body.userId);
     const parentFolderId = req.body.parentFolderId || null;
     const isFolder = parseInt(req.body.isFolder) || 0;
@@ -35,11 +37,11 @@ const createFile = async (req, res) => {
         const result = await new Promise((resolve, reject) => {
             streamifier.createReadStream(req.file.buffer).pipe(
                 cloudinary.uploader.upload_stream(
-                    { folder: 'uploads' },
+                    { folder: `uploads/user_${userId}` },
                     (error, result) => {
                         if (error) reject(error);
                         else resolve(result);
-                    }
+                    }   
                 )
             );
         });
@@ -65,8 +67,39 @@ const createFile = async (req, res) => {
 };
 
 
+//Lấy list file tại thư mục nào đó
+const getUserFiles = async (req, res) => {
+    const userId = parseInt(req.query.userId);
+    const parentFolderId = req.query.parentFolderId || null;
+
+    try {
+        const result = await FileService.getUserFiles(userId, parentFolderId);
+    
+        res.json({ message: 'Lấy danh sách tệp thành công', files: result.files });
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách file:', error);
+        res.status(500).json({ error: 'Lỗi khi lấy danh sách file.', info: error.message });
+    }
+};
+
+
+//lấy chính xác 1 file nào đó
+const getUserFile = async (req,res) => {
+    const userId = parseInt(req.query.userId);
+    const fileId = parseInt(req.query.fileId);
+    try{
+        const result = await FileService.getUserFile(userId,fileId);
+        
+        res.json({message: 'lấy file thành công', file: result.file})
+    }catch(error){
+        console.error('Lỗi khi lấy file: ',error)
+        res.status(500).json({error: 'Lỗi khi lấy file', info: error.message})
+    }
+}
 
 module.exports = {
-    createFile
+    createFile,
+    getUserFiles,
+    getUserFile
 };
 

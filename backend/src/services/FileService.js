@@ -1,5 +1,8 @@
 const sql = require('mssql');
-const { pool, poolConnect } = require('../../db');
+const {
+    pool,
+    poolConnect
+} = require('../../db');
 
 async function createFile({
     userId,
@@ -35,8 +38,6 @@ async function createFile({
         `);
 
         return {
-            status: 'SUCCESS',
-            message: 'Tạo tệp thành công',
             file: result.recordset[0]
         };
     } catch (error) {
@@ -45,6 +46,55 @@ async function createFile({
     }
 }
 
+getUserFiles = async (userId, parentFolderId = null) => {
+    try {
+        await poolConnect;
+        const request = pool.request();
+        request.input('userId', sql.Int, userId);
+
+        request.input('parentFolderId', sql.Int, parentFolderId);
+
+        const result = await request.query(`
+            SELECT * FROM Files 
+            WHERE userId = @userId ${parentFolderId === null ? 'AND parentFolderId IS NULL' : 'AND parentFolderId = @parentFolderId'}
+        `);
+
+        console.log('Kết quả truy vấn:', result);
+        console.log('userId:', userId);
+        console.log('parentFolderId:', parentFolderId, 'typeof:', typeof parentFolderId);
+
+        return {
+            files: result.recordset
+        };
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách file trong DB:', error);
+        throw error;
+    }
+}
+
+getUserFile = async (userId, fileId) => {
+    try {
+        await poolConnect;
+        const request = pool.request();
+        request.input('userId', userId);
+        request.input('id', fileId);
+
+        const result = await request.query(`
+            select * from Files where userId = @userId and id = @id
+            `)
+
+        return {
+            file: result.recordset
+        }
+
+    } catch (error){
+        console.error('Lỗi khi lấy danh sách file trong DB:', error);
+        throw error;
+    }
+}
+
 module.exports = {
-    createFile
+    createFile,
+    getUserFiles,
+    getUserFile
 };
