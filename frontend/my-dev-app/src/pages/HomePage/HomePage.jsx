@@ -7,6 +7,7 @@ import ImageComponent from '../../components/ImageComponent/ImageComponent';
 import VideoComponent from '../../components/VideoComponent/VideoComponent';
 
 
+
 const HomePage = ({event}) => {  
   const [openItem, setOpenItem] = useState('AllFile'); // ✅ quản lý trạng thái ở đây
 

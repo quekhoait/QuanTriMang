@@ -3,7 +3,6 @@ import HomePage from '../pages/HomePage/HomePage'
 import SigInPage from "../pages/SigInPage/SigInPage";
 import SigUpPage from "../pages/SigUpPage/SigUpPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
-import Test from "../pages/ProfilePage/Test";
 
 export const routes = [
     {
@@ -20,9 +19,6 @@ export const routes = [
     },{
         path: "/profile",
         page: ProfilePage
-    },{
-        path: "/test",
-        page: Test
     }
 ]
 

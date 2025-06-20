@@ -1,7 +1,8 @@
-import React, { use, useState } from 'react'
+import React, { use, useEffect, useRef, useState } from 'react'
 import NavbarComponent from '../../components/NavbarComponent/NavbarComponent'
-import avatarImg from '../../assets/1ijqna72ktqfeb86jl62e8lfg.jpg'
+import imageUser from '../../assets/user.png'
 import LabelFieldComponent from '../../components/ProfileComponent/LabelFieldComponent'
+import { useUser } from '../../contexts/UserContext'
 
 
 const ProfilePage = () => {
@@ -9,16 +10,89 @@ const ProfilePage = () => {
     const [isEditing, setEditing] = useState(false)
 
     //info
-    const [name, setName] = useState('Alexa Rawles');
-    const [email, setEmail] = useState('alexarawles@gmail.com');
-    const [password, setPassword] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('0901234444');
-    const [gender, setGender] = useState('Gay')
-    const [birthDay, setBirthDay] = useState('2000-01-01');
+    const {account, getUser} = useUser();
+    const [usernameUpdate, setUsernameUpdate] = useState();
+    const [emailUpdate, setEmailUpdate] = useState();
+    const [passwordUpdate, setPasswordUpdate] = useState();
 
 
+    useEffect((e)=>{
+      if(account?.data?.username){
+        setUsernameUpdate(account?.data?.username)
+      }
+    },[account?.data?.username])
 
+    useEffect((e)=>{
+      if(account?.data?.email){
+        setEmailUpdate(account?.data?.email)
+      }
+    },[account?.data?.email])
 
+    useEffect((e)=>{
+      if(account?.data?.password){
+        setPasswordUpdate(account?.data?.password)
+      }
+    },[account?.data?.password])
+
+    //Lấy ảnh
+    const [selectImage, setSelectImage] = useState();
+    const [selectFileImage, setSelectFileImage] = useState();
+    const fileInputRef = useRef(null);
+    const handleChooseIamge = (e)=>{
+      e.preventDefault();
+      fileInputRef.current.click();
+    }
+
+    const handleChangeImage = (e)=>{
+      const file = e.target.files?.[0];
+      if(!file){
+        return;
+      }
+      setSelectFileImage(file);
+      setSelectImage(file);
+    }
+    //////////////////
+    //Đổi avatar
+    const [hoverAvatar, setHoverAvatar] = useState(false)
+    const [showEditImage, setShowEditImage] = useState(false)
+
+useEffect(() => {
+  if (hoverAvatar && isEditing) {
+    setShowEditImage(true);
+  } else {
+    setShowEditImage(false); // ẩn khi không hover hoặc không edit
+  }
+}, [hoverAvatar, isEditing]); 
+////////////////////////////
+//Update user
+  const handleUpdate = async()=>{
+    try{
+      const formData = new FormData();
+      formData.append("username", usernameUpdate);
+      formData.append("email", emailUpdate);
+      formData.append("password", passwordUpdate);
+      if(selectFileImage){
+        formData.append('avatar', selectFileImage)
+      }
+      const response =await fetch(`http://localhost:5999/api/user/update/${account?.data?.id}`, {
+        method: "PUT",
+        body :formData
+      })
+      const data = await response.json();
+      if(response.ok){
+        alert("Cập nhật thành công");
+          setEditing(false);
+      }else{
+        alert("Lỗi1" + data.message)
+      }
+    }catch(err){
+      alert("Lỗi" + err.message)
+    }
+  }
+
+  const handleEdit =()=>{
+    setEditing(true);
+  }
     return (
         <>
             <div className="min-w-screen flex bg-[#ebebeb]">
@@ -30,7 +104,6 @@ const ProfilePage = () => {
                         <h2 className="text-lg font-bold">Thông Tin Cá Nhân</h2>
                     </div>
 
-
                     <div className="w-full bg-white rounded-t-lg shadow-lg overflow-hidden">
                         {/* Gradient Header */}
                         <div className="w-full">
@@ -40,72 +113,70 @@ const ProfilePage = () => {
                         {/* Profile Section – avatar chồng lên gradient */}
                         <div className="-mt-16 p-6 flex items-center justify-between">
                             <div className="flex items-center space-x-4">
-                                <img
-                                    src={avatarImg}
-                                    className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-md"
-                                    alt="Avatar"
-                                />
+                              <div className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-md flex items-center justify-center">
+                                      <div className="relative w-full h-full rounded-full overflow-hidden" 
+                                        onMouseEnter={() => setHoverAvatar(true)}
+                                        onMouseLeave={() => setHoverAvatar(false)}>
+                                        <img
+                                          src={selectImage ? URL.createObjectURL(selectFileImage) : account?.data?.avatar}
+                                          className="w-full h-full object-cover"
+                                          alt="Avatar"
+                                        />
+                                        {showEditImage && (
+                                          <div
+                                            className="absolute bottom-0 left-0 w-full h-[36px] bg-[rgb(121_120_120_/_50%)] rounded-b-full flex items-center justify-center cursor-pointer"
+                                            onClick={handleChooseIamge}
+                                          >
+                                            <span className="text-white font-medium">Choose</span>
+                                          </div> 
+                                        )}                                       
+                                        <input 
+                                          type="file"
+                                          ref={fileInputRef}
+                                          onChange={handleChangeImage}
+                                          accept="image/jpeg,image/png,image/webp"    
+                                          style={{ display: 'none' }}
+                                        />
+                                      </div>
+                                    </div>
+
                                 <div className='pt-3'>
-                                    <h2 className="text-xl font-bold">Alexa Rawles</h2>
-                                    <p className="text-gray-500 text-sm">alexarawles@gmail.com</p>
+                                    <h2 className="text-xl font-bold">{usernameUpdate}</h2>
+                                    <p className="text-gray-500 text-sm">{emailUpdate}</p>
                                 </div>
                             </div>
-                            {!isEditing ?
-                                (<button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                                    onClick={() => setEditing(!isEditing)}>
-                                    Chỉnh Sửa Thông Tin
-                                </button>) :
-                                (<button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                                    onClick={() => setEditing(!isEditing)}>
-                                    Cập Nhật
-                                </button>)}
-                        </div>
+                              <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"                          
+                                onClick={isEditing ? handleUpdate : handleEdit}
+                              >
+                                {!isEditing ? "Chỉnh sửa thông tin" : "Cập nhật"}
+                              </button>
+                            </div>
 
                         {/* Form */}
                         <div className="grid grid-cols-2 gap-x-24 px-4 pb-4 gap-y-5 ">
                             <LabelFieldComponent
-                                label="Họ Tên"
-                                value={name}
+                                label="Username"
+                                value={usernameUpdate}
                                 placeholder="Nhập Thông Tin Họ Tên..."
                                 isEditing={isEditing}
-                                onChange={(e) => setName(e.target.value)}
+                                onChange={(e) => setUsernameUpdate(e.target.value)}
                             />
                             <LabelFieldComponent
                                 label="Email"
-                                value={email}
+                                value={emailUpdate}
                                 placeholder="Nhập Thông Tin Email..."
                                 isEditing={isEditing}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) => setEmailUpdate(e.target.value)}
                             />
                             <LabelFieldComponent
                                 label="Password"
-                                value={password}
+                                value={isEditing ? passwordUpdate : "******"}
                                 placeholder="Nhập Thông Tin Password..."
                                 isEditing={isEditing}
                                 type='password'
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <LabelFieldComponent
-                                label="số Điện Thoại"
-                                value={phoneNumber}
-                                placeholder="Nhập thông tin số điện thoại..."
-                                isEditing={isEditing}
-                                onChange={(e) => setPhoneNumber(e.target.value)}
-                            />
-                            <LabelFieldComponent
-                                label="Giới Tính"
-                                value={gender}
-                                placeholder="Nhập thông tin giới tính..."
-                                isEditing={isEditing}
-                                onChange={(e) => setGender(e.target.value)}
-                            />
-                            <LabelFieldComponent
-                                label="Ngày Sinh"
-                                value={birthDay}
-                                placeholder="Nhập thông tin ngày sinh..."
-                                isEditing={isEditing}
-                                onChange={(e) => setBirthDay(e.target.value)}
-                            />
+                                onChange={(e) => setPasswordUpdate(e.target.value)}
+                                
+                            />                        
                         </div>
                     </div>
 

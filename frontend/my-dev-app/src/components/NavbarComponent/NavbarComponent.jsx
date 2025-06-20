@@ -1,10 +1,21 @@
 import React, { useState } from 'react'
-import image from '../../assets/user.png'
+import imageUser from '../../assets/user.png'
 import { useUser } from '../../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const NavbarComponent = () => {
     const [isOpen, setIsOpen] = useState(false);    
     const {account, getUser} = useUser();
+
+    const navigate = useNavigate();
+
+    const handleProfile = ()=>{
+        navigate("/profile")
+    }
+
+    const handleHomePage = ()=>{
+        navigate("/")
+    }
 
   return (
     <div className="bg-white py-[16px]  w-[100%] flex items-center justify-center shadow-md fixed">
@@ -12,7 +23,7 @@ const NavbarComponent = () => {
         <div className="flex items-center w-[40%] justify-between">
           <div className="flex items-center space-x-2">
             <img src="/logo192.png" alt="Logo" className="w-8 h-8" />
-            <span className="text-xl font-bold text-gray-800">TeraBox</span>
+            <span onClick = {handleHomePage} className="text-xl font-bold text-gray-800 cursor-pointer">TeraBox</span>
           </div>
 
           {/* Search */}
@@ -32,7 +43,7 @@ const NavbarComponent = () => {
           <div className="relative">
             <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
               <img
-              src="https://i.imgur.com/0y0y0y0.png"
+              src={account?.data?.avatar}
               alt="avatar"
               className="w-9 h-9 rounded-full cursor-pointer"
               />
@@ -40,9 +51,8 @@ const NavbarComponent = () => {
             </div>
             {isOpen && (
               <ul className="absolute right-[-20px] mt-2 w-40 bg-white border rounded-lg shadow-lg z-10">
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Profile</li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Log Out</li>
+                <li onClick = {handleProfile} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Profile</li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Đăng xuất</li>
               </ul>
             )}
           </div>
