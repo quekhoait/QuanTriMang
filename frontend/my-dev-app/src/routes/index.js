@@ -7,7 +7,7 @@ import Test from "../pages/ProfilePage/Test";
 
 export const routes = [
     {
-        path: "/homePage",
+        path: "/",
         page: HomePage
     },
     {

@@ -74,8 +74,6 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
     } else {
       setIsAllFileState(true);
     }
-
-    console.log("isAllFile:", isAllFileState);
   }, [selectRow]);
 
 
@@ -125,7 +123,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
           <span>⬆</span>
           <span>Upload</span>
         </button>
-        {isAllFile && isAllFileState &&
+        {!isAllFile && isAllFileState &&
           <button className="border px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-100" onClick={createNewFolder}>
             <span><FaFolderOpen /></span>
             <span>New Folder</span>

@@ -31,7 +31,7 @@ export default function SignInPage() {
           localStorage.setItem('accessToken', data.accessToken);
         // localStorage.setItem('refreshToken', data.refreshToken);
           setAccessToken(data.accessToken);
-          navigate('/homepage')
+          navigate('/')
         }else{
           setError("Lỗi " + data.message)
         }
