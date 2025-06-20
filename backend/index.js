@@ -1,17 +1,24 @@
 const express = require("express");
 const { pool, poolConnect } = require("./db"); // Không cần `sql` ở đây
 const routes = require("./src/routes");
-
-
+const path = require('path')
+const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = 5999;
 
+
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 const cors = require('cors'); //kết nối db
 app.use(cors({
   origin: 'http://localhost:3000', // React app
   credentials: true
 }));
+
+//gửi ảnh qua font-end
+app.use('/uploads', express.static(path.join(__dirname, 'src', 'uploads')));
+
 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());

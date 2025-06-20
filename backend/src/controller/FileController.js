@@ -1,4 +1,4 @@
-const FileService = require('../services/FileService.js');
+const FileServices = require('../services/FileServices.js');
 const streamifier = require('streamifier')
 const cloudinary = require('../../cloudinary.js');
 const dotenv = require('dotenv');
@@ -17,7 +17,7 @@ const createFile = async (req, res) => {
     try {
         if (isFolder === 1) {
             // 👈 Trường hợp tạo FOLDER, không upload Cloudinary
-            const newFolder = await FileService.createFile({
+            const newFolder = await FileServices.createFile({
                 userId,
                 parentFolderId,
                 fileName,
@@ -46,7 +46,7 @@ const createFile = async (req, res) => {
             );
         });
 
-        const newFile = await FileService.createFile({
+        const newFile = await FileServices.createFile({
             userId,
             parentFolderId,
             fileName,
@@ -73,7 +73,7 @@ const getUserFiles = async (req, res) => {
     const parentFolderId = req.query.parentFolderId || null;
 
     try {
-        const result = await FileService.getUserFiles(userId, parentFolderId);
+        const result = await FileServices.getUserFiles(userId, parentFolderId);
     
         res.json({ message: 'Lấy danh sách tệp thành công', files: result.files });
     } catch (error) {
@@ -88,7 +88,7 @@ const getUserFile = async (req,res) => {
     const userId = parseInt(req.query.userId);
     const fileId = parseInt(req.query.fileId);
     try{
-        const result = await FileService.getUserFile(userId,fileId);
+        const result = await FileServices.getUserFile(userId,fileId);
         
         res.json({message: 'lấy file thành công', file: result.file})
     }catch(error){

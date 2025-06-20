@@ -102,10 +102,10 @@ const updateUser = async(req, res)=>{
     try{
         const userId = req.params.id
         const data = req.body;
-        // const file = req.file;
-        // if(file){
-        //     data.avatar = `http://localhost:5999/uploads/avatar/${file.filename}`;
-        // }
+        const file = req.file;
+        if(file){
+            data.avatar = `http://localhost:5999/uploads/avatar/${file.filename}`;
+        }
         if(!userId){
             return res.status(200).json({
                 status: 'ERR',

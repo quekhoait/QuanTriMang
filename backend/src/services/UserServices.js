@@ -34,7 +34,8 @@ const createUser = (newUser) => {
           .input("email", newUser.email)
           .input("username", newUser.username)
           .input("password", newUser.password)
-          .query("INSERT INTO Account (email, username, password) VALUES (@email, @username, @password)");
+          .input("avatar","http://localhost:5999/uploads/avatar/user.png" )
+          .query("INSERT INTO Account (email, username, password, avatar) VALUES (@email, @username, @password, @avatar)");
 
         return resolve({
           status: "SUCCESS",
