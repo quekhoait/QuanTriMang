@@ -3,6 +3,7 @@ import NavbarComponent from '../../components/NavbarComponent/NavbarComponent'
 import imageUser from '../../assets/user.png'
 import LabelFieldComponent from '../../components/ProfileComponent/LabelFieldComponent'
 import { useUser } from '../../contexts/UserContext'
+import FormAuthenComponent from '../../components/FormAuthenComponent/FormAuthenComponent'
 
 
 const ProfilePage = () => {
@@ -14,8 +15,7 @@ const ProfilePage = () => {
     const [usernameUpdate, setUsernameUpdate] = useState();
     const [emailUpdate, setEmailUpdate] = useState();
     const [passwordUpdate, setPasswordUpdate] = useState();
-
-
+    
     useEffect((e)=>{
       if(account?.data?.username){
         setUsernameUpdate(account?.data?.username)
@@ -90,14 +90,34 @@ useEffect(() => {
     }
   }
 
-  const handleEdit =()=>{
-    setEditing(true);
+  const handleShowForm =()=>{
+    if(isShowForm){
+      setIsShowForm(false);    
+      return;
+    }else{
+      setIsShowForm(true);   
+      return; 
+    }
   }
+
+  const handleEdit = ()=>{
+      setEditing(true);
+      setIsShowForm(false);    
+  }
+//Ẩn hiện form xác nhận mật khẩu
+  const [isShowForm, setIsShowForm] = useState(false);
+
     return (
         <>
             <div className="min-w-screen flex bg-[#ebebeb]">
                 <NavbarComponent />
-
+                {isShowForm && (
+                  <FormAuthenComponent 
+                    onSuccess={handleEdit}
+                    onClose={handleShowForm}
+                  />
+                  )
+                }
                 <div className="w-full h-screen px-24 mt-24 bg-[#ebebeb] flex space-x-4 items-start justify-between">
                     {/* Sidebar */}
                     <div className="rounded-tl-xl rounded-bl-xl border-2 border-black w-[20%] bg-white bg-opacity-10 text-gray-900 p-2 mt-8 space-y-4">
@@ -146,7 +166,7 @@ useEffect(() => {
                                 </div>
                             </div>
                               <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"                          
-                                onClick={isEditing ? handleUpdate : handleEdit}
+                                onClick={isEditing ? handleUpdate : handleShowForm}
                               >
                                 {!isEditing ? "Chỉnh sửa thông tin" : "Cập nhật"}
                               </button>

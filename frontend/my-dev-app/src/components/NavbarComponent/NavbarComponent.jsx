@@ -17,6 +17,25 @@ const NavbarComponent = () => {
         navigate("/")
     }
 
+    //Đăng xuất user
+    const handleLogout = async()=>{
+      try{
+        const response = await fetch('http://localhost:5999/api/user/logout',{
+          method: "POST",
+          headers: {
+            'Contet-Type': 'application/json'
+          }
+        })
+        if(response.ok){
+          alert("Đăng xuát thành công");
+          localStorage.removeItem('accessToken');
+          navigate('/account/login');
+        }
+      }catch(err){
+        alert("Lỗi đăng xuất" + err.message)
+      }
+    }
+
   return (
     <div className="bg-white py-[16px]  w-[100%] flex items-center justify-center shadow-md fixed">
       <nav className="flex items-center justify-between w-[90%]">
@@ -45,14 +64,14 @@ const NavbarComponent = () => {
               <img
               src={account?.data?.avatar}
               alt="avatar"
-              className="w-9 h-9 rounded-full cursor-pointer"
+              className="w-9 h-9 rounded-full cursor-pointer !m-auto"
               />
               <p className="text-blue-700 font-medium" >{account?.data?.username}</p>
             </div>
             {isOpen && (
               <ul className="absolute right-[-20px] mt-2 w-40 bg-white border rounded-lg shadow-lg z-10">
                 <li onClick = {handleProfile} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Profile</li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Đăng xuất</li>
+                <li onClick = {handleLogout} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Đăng xuất</li>
               </ul>
             )}
           </div>

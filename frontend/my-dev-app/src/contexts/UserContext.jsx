@@ -54,6 +54,8 @@ useEffect(() => {
   }
 }, [accessToken]);
 
+
+
   return (
     <UserContext.Provider value={{ account, accessToken, setAccessToken, getUser }}>
       {children}

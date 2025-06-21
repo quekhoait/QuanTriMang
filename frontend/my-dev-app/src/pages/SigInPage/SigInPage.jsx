@@ -14,6 +14,15 @@ export default function SignInPage() {
   const [password, setPassword] = useState();
     const { setAccessToken, setRefreshToken } = useUser();
 
+    const [eye, setEye] = useState(false);
+    const handleEye=()=>{
+    if(eye){
+      setEye(false);
+    }else{
+      setEye(true);
+    }
+  }
+
     const handleSubmitSigIn = async(e)=>{
       e.preventDefault();
       try{
@@ -73,14 +82,15 @@ export default function SignInPage() {
           <div className="relative">
             <label className="block mb-1 text-white text-left">Mật khẩu</label>
             <input
-              type="password"
+              type={!eye ? 'text' : "password"}
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
               placeholder="Nhập mật khẩu"
               value={password}
               onChange={(e)=>setPassword(e.target.value)}
               required
             />
-            <i class="fa-regular fa-eye absolute top-[60%] right-4 cursor-pointer "></i>
+              <i onClick={handleEye} className={`absolute top-[60%] right-4 cursor-pointer text-gray-500 ${
+                eye ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'}`}></i>
           </div>
           <button
             type="submit"

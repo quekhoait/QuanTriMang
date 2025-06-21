@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import image from '../../assets/anhnen3.png';
+import { useUser } from '../../contexts/UserContext';
 
 const SigUpPage = () => {
 
@@ -14,6 +15,11 @@ const SigUpPage = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [confirmPassWord, setConfirmPassword] = useState();
+
+    const [eye1, setEye1] = useState(false);
+    const [eye2, setEye2] = useState(false);
+    const handleEye1 = () => setEye1(prev => !prev);
+    const handleEye2 = () => setEye2(prev => !prev);
 
     const handleSubmitRegis = async(e)=>{
       e.preventDefault();
@@ -99,25 +105,27 @@ const SigUpPage = () => {
                 <div className="relative">
                 <label className="block mb-1 text-white text-left">Mật khẩu</label>
                 <input
-                  type="password"
+                  type={!eye1 ? 'text' : "password"}
                   className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
                   placeholder="Nhập mật khẩu"
                   value={password}
                   onChange={(e)=>setPassword(e.target.value)}
                   required
                 />
-                <i class="fa-regular fa-eye absolute top-[60%] right-4 cursor-pointer "></i>
+                <i onClick={handleEye1} className={`absolute top-[60%] right-4 cursor-pointer text-gray-500 ${
+                eye1 ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'}`}></i>
               </div>   <div className="relative">
                 <label className="block mb-1 text-white text-left">Xác nhận Mật khẩu</label>
                 <input
-                  type="password"
+                  type={!eye2 ? 'text' : "password"}
                   className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
                   placeholder="Nhập mật khẩu"
                   value={confirmPassWord}
                   onChange={(e)=>setConfirmPassword(e.target.value)}
                   required
                 />
-                <i class="fa-regular fa-eye absolute top-[60%] right-4 cursor-pointer "></i>
+                <i onClick={handleEye2} className={`absolute top-[60%] right-4 cursor-pointer text-gray-500 ${
+                eye2 ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'}`}></i>
               </div>
                <button
                  type="submit"
