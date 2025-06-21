@@ -85,7 +85,6 @@ const getUser  =async(req, res)=>{
 const refreshToken = async(req, res)=>{
   try{
     const refreshToken = req.cookies.refreshToken;
-    console.log(refreshToken)
     if(!refreshToken) res.sendStatus(401);
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, data)=>{
       if(err) res.sendStatus(403)
@@ -119,10 +118,26 @@ const updateUser = async(req, res)=>{
     }
 }
 
+const logoutUser = async(req, res)=>{
+  try{
+    const refreshToken = req.cookies.refreshToken;
+    if(!refreshToken) return res.sendStatus(203);
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        samesite: 'strict',
+        secure: false
+    })
+    return res.sendStatus(200);
+  }catch(e){
+      return res.status(500).json({ message: 'Đăng xuất thất bại' });
+  }
+}
+
 module.exports = {
     createUser,
     loginUser,
     getUser,
     refreshToken,
-    updateUser
+    updateUser,
+    logoutUser
 }
