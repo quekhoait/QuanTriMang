@@ -1,22 +1,28 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaTh, FaFolderOpen, FaShareAlt } from "react-icons/fa";
 import { AiOutlineFolderAdd } from "react-icons/ai";
 import { CiMenuKebab } from "react-icons/ci";
 
 import { FaRegStar } from "react-icons/fa6";
+import { useUser } from "../../contexts/UserContext";
 
-export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
+export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
 
   //Tạo thêm folder mới
   const [isCreating, setIsCreating] = useState(false);
   const [nameNewFolder, setNameNewFolder] = useState("New folder")
+  const [dateTime, setDateTime] = useState();
 
   const createNewFolder = () => {
     setIsCreating(true);
     setNameNewFolder("New Folder")
   }
-
+  
   const [listFils, setListFils] = useState(listFiles);
+  useEffect(()=>{
+    setListFils(listFiles)
+  }, [listFiles])
+
 
   const handlSaveNewFolder = () => {
     if (nameNewFolder.trim() === " ") return;
@@ -30,8 +36,10 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
       }),
       size: "-"
     }
+    setDateTime(newFolder.date);
     setListFils([newFolder, ...listFils]);
     setIsCreating(false);
+    createFile();
   }
 
   const [selectRow, setSelectRow] = useState([])
@@ -90,7 +98,39 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
     }
   };
 
-  const handleSaveRename = () => {
+
+  //Tạo folder mới
+  const {account, getUser} = useUser();
+  
+  const createFile = async()=>{
+    try{
+      const response = await fetch('http://localhost:5999/api/file/upload',{
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: account?.data?.id,
+          fileName: nameNewFolder,
+          fileType: "folder",
+          createDate: dateTime,
+          isFolder: 1,
+          parentFolderId: rowId 
+       })
+      })
+      const data = await response.json();
+      if(response.ok){
+        alert("Tạo thành công");
+      }else{
+        alert("Tạo folder thất bại" + data.message)
+      }
+    }catch(err){
+      alert("Lỗi server"+ err.message)
+    }
+  }
+
+    const handleSaveRename = () => {
       if (renameValue.trim() === "") return;
 
       const newList = listFils.map(file => {
@@ -105,6 +145,11 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
       setSelectRow([]);
     };
 
+    //Lấy id của hàng mình nhấn
+
+    const handleRowClick = (e)=>{
+      setRowId(e);
+    }
 
   return (
     <div className="p-6">
@@ -183,8 +228,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
 
             {isCreating &&
               <tr className="border-b hover:bg-gray-100">
-                <td><input type="checkbox"
-                /></td>
+                <td><input type="checkbox"/></td>
                 <td className="p-2 flex items-center space-x-2">
                   <FaFolder className="text-yellow-500" />
                   <input
@@ -200,21 +244,21 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
               </tr>
             }
             {listFils.map((file, i) => {
-              const isSelected = selectRow.includes(file.name);
+              const isSelected = selectRow.includes(file.fileName);
               return (
-                <tr key={i} className={`group border-b hover:bg-gray-100 ${isSelected ? 'bg-[rgb(181_227_243)]' : ''}`}>
+                <tr  onDoubleClick={file.isFolder ? () => handleRowClick(file.id) : undefined} key={i} className={`group border-b hover:bg-gray-100 ${isSelected ? 'bg-[rgb(181_227_243)]' : ''}`}>
                   <td className={`p-2 text-blue-700 w-8 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:!opacity-100'} transition-opacity duration-200`}>
                     <input type="checkbox" checked={isSelected}
-                      onChange={(e) => handleListSelect(file.name, e.target.checked)}
+                      onChange={(e) => handleListSelect(file.fileName, e.target.checked)}
                      />
                   </td>
                   <td className="cursor-pointer p-2 flex items-center space-x-2">
-                    {file.type === "folder" ? (
+                    {file.isFolder === true ? (
                       <FaFolder className="text-yellow-500" />
                     ) : (
                       <FaFilePdf className="text-red-500" />
                     )}
-                    {renamingFile === file.name ? (
+                    {renamingFile === file.fileName ? (
                       <input
                         autoFocus
                         value={renameValue}
@@ -226,12 +270,12 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName }) {
                         className="border px-2 py-1 rounded"
                       />
                     ) : (
-                      <span>{file.name}</span>
+                      <span>{file.fileName}</span>
                     )}
 
                   </td>
-                  <td className="p-2">{file.date}</td>
-                  <td className="p-2">{file.size || "-"}</td>
+                  <td className="p-2">{file.createDate}</td>
+                  <td className="p-2">{file.fileSize || "-"}</td>
                 </tr>
               )
             }

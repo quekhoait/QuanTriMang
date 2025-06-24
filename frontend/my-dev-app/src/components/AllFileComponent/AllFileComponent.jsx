@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import FilePageComponent from '../FilePageComponent/FilePageComponent'
 import { FaFilePdf, FaFolder } from 'react-icons/fa';
+import { useUser } from '../../contexts/UserContext';
 
 
 const flatData = [
@@ -14,22 +15,49 @@ const flatData = [
 
 
 export const AllFileComponent = () => {  
+  const {account, getUser} = useUser();
 
-  const files = [
-  { name: "video", date: "Mar 07", type: "folder" },
-  { name: "AI", date: "Dec 05,2024", type: "folder" },
-  { name: "img_video", date: "Dec 05,2024", type: "folder" },
-  { name: "ae", date: "Sep 30,2024", type: "folder" },
-  { name: "MMT", date: "Jul 20,2024", type: "folder" },
-  { name: "From:  SM-A325F", date: "Jun 25,2024", type: "folder" },
-  { name: "SổtayBắtđầuTeraBox.pdf", date: "Jun 25,2024", size: "44.38MB", type: "pdf" },
-];
+  const [listFile, setListFile] = useState([]);
+    const [rowId, setRowId] = useState();
+  console.log(rowId)
 
-  return (  
-    <FilePageComponent 
-      listFiles={files}
+  const getListFile = async()=>{
+    const userId = account?.data?.id;
+    const parentFolderId = rowId === undefined ? null : rowId;
+    try{
+      const response = await fetch(`http://localhost:5999/api/file/listFile/${userId}/${parentFolderId===null ? 'NULL' : rowId}`,{
+        method: "GET",
+        credentials: 'include'
+      })
+      const data = await response.json();
+      if(response.ok){
+        console.log(data.files)
+        setListFile(data.files)
+      }else{
+        alert("Lỗi khi lấy danh sách: " + data.message)
+      }
+    }catch(err){
+      console.error("Lỗi fetch API", err);
+    }
+  }
+
+  useEffect((e)=>{
+    if(account?.data?.id){
+      getListFile();
+    }
+  }, [account?.data?.id,rowId])
+
+
+
+
+  return (
+  <FilePageComponent 
+      listFiles={listFile}
       fileName={"All file"}
       isAllFile={false}
-    />
+      setRowId={setRowId}
+      rowId = {rowId}
+    />  
+  
   )
 }
