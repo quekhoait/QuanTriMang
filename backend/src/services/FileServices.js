@@ -4,7 +4,7 @@ const {
     poolConnect
 } = require('../../db');
 
-const createFile= async(
+const createFile= async({
     userId,
     parentFolderId = null,
     fileName,
@@ -15,7 +15,7 @@ const createFile= async(
     publicId,
     createDate,
     updateDate = null,
-) => {
+  }) => {
     try {
         await poolConnect;
         const request = pool.request();
@@ -33,10 +33,8 @@ const createFile= async(
         const result = await request.query(`
             INSERT INTO Files (userId, parentFolderId, fileName, fileSize, fileType, isFolder, keyPath, publicId, createDate, updateDate)
             VALUES (@userId, @parentFolderId, @fileName, @fileSize, @fileType, @isFolder, @keyPath, @publicId, @createDate, @updateDate);
-
             SELECT * FROM Files WHERE id = SCOPE_IDENTITY();
-        `);
-
+        `); 
         return {
             file: result.recordset[0]
         };
@@ -53,16 +51,17 @@ const getUserFiles = async (userId, parentFolderId = null) => {
         request.input('userId', sql.Int, userId);
 
         request.input('parentFolderId', sql.Int, parentFolderId);
+        console.log('userId:', userId, typeof userId);
+        console.log('parentFolderId:', parentFolderId, typeof parentFolderId);
+
 
         const result = await request.query(`
             SELECT * FROM Files 
             WHERE userId = @userId ${parentFolderId === null ? 'AND parentFolderId IS NULL' : 'AND parentFolderId = @parentFolderId'}
         `);
-
-        console.log('Kết quả truy vấn:', result);
+        console.log('Kết quả truy vấn:', result.recordset);
         console.log('userId:', userId);
         console.log('parentFolderId:', parentFolderId, 'typeof:', typeof parentFolderId);
-
         return {
             files: result.recordset
         };

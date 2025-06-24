@@ -10,7 +10,7 @@ const {
 const upload = multer();
 
 router.post('/upload', upload.single('file'), createFile);
-router.get('/list', getUserFiles);
-router.get('/one',getUserFile);
+router.get('/listFile/:userId/:parentFolderId', getUserFiles);
+router.get('/oneFile/:userId/:fileId',getUserFile);
 
 module.exports = router;

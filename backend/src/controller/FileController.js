@@ -9,7 +9,7 @@ const createFile = async (req, res) => {
     const fileName = (req.file?.originalname || req.body.fileName)?.trim();
     const fileSize = req.file?.size || 0;
     const fileType = req.file?.mimetype.trim() || null;
-    const userId = parseInt(req.body.userId);
+    const userId = req.body.userId;
     const parentFolderId = req.body.parentFolderId || null;
     const isFolder = parseInt(req.body.isFolder) || 0;
     const updateDate = null;
@@ -17,6 +17,7 @@ const createFile = async (req, res) => {
     try {
         if (isFolder === 1) {
             // 👈 Trường hợp tạo FOLDER, không upload Cloudinary
+
             const newFolder = await FileServices.createFile({
                 userId,
                 parentFolderId,
@@ -29,7 +30,6 @@ const createFile = async (req, res) => {
                 createDate: new Date(),
                 updateDate: null,
             });
-
             return res.json({ message: 'Tạo thư mục thành công!', file: newFolder });
         }
 
@@ -69,12 +69,11 @@ const createFile = async (req, res) => {
 
 //Lấy list file tại thư mục nào đó
 const getUserFiles = async (req, res) => {
-    const userId = parseInt(req.query.userId);
-    const parentFolderId = req.query.parentFolderId || null;
-
+    const userId = req.params.userId;
+    const parentFolderId = req.params.parentFolderId === 'NULL' ? null : parseInt(req.params.parentFolderId);
     try {
         const result = await FileServices.getUserFiles(userId, parentFolderId);
-    
+      console.log("result: ", result)
         res.json({ message: 'Lấy danh sách tệp thành công', files: result.files });
     } catch (error) {
         console.error('Lỗi khi lấy danh sách file:', error);
@@ -85,11 +84,10 @@ const getUserFiles = async (req, res) => {
 
 //lấy chính xác 1 file nào đó
 const getUserFile = async (req,res) => {
-    const userId = parseInt(req.query.userId);
-    const fileId = parseInt(req.query.fileId);
+    const userId = parseInt(req.params.userId);
+    const fileId = parseInt(req.params.fileId);
     try{
-        const result = await FileServices.getUserFile(userId,fileId);
-        
+        const result = await FileServices.getUserFile(userId,fileId);        
         res.json({message: 'lấy file thành công', file: result.file})
     }catch(error){
         console.error('Lỗi khi lấy file: ',error)
