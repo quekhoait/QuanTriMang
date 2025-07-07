@@ -2,11 +2,12 @@ import { useState, useEffect, useRef, use } from "react";
 import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaTh, FaFolderOpen, FaShareAlt } from "react-icons/fa";
 import { AiOutlineFolderAdd } from "react-icons/ai";
 import { CiMenuKebab } from "react-icons/ci";
-
 import { FaRegStar } from "react-icons/fa6";
 import { useUser } from "../../contexts/UserContext";
 
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
+  //listFiles json dữ liệu tệp tin lấy api/file/listFile/:userId/:parentFolderId
+
 
   //Tạo thêm folder mới
   const [isCreating, setIsCreating] = useState(false);
@@ -17,10 +18,10 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     setIsCreating(true);
     setNameNewFolder("New Folder")
   }
-  
-  const [listFils, setListFils] = useState(listFiles);
-  useEffect(()=>{
-    setListFils(listFiles)
+
+  const [listFile, setlistFile] = useState(listFiles);
+  useEffect(() => {
+    setlistFile(listFiles)
   }, [listFiles])
 
 
@@ -37,7 +38,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
       size: "-"
     }
     setDateTime(newFolder.date);
-    setListFils([newFolder, ...listFils]);
+    setlistFile([newFolder, ...listFile]);
     setIsCreating(false);
     createFile();
   }
@@ -53,7 +54,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
 
   const handleAllSelect = (checked) => {
     if (checked) {
-      setSelectRow(listFils.map(file => file.name));
+      setSelectRow(listFile.map(file => file.name));
     } else {
       setSelectRow([]);
     }
@@ -100,11 +101,11 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
 
 
   //Tạo folder mới
-  const {account, getUser} = useUser();
-  
-  const createFile = async()=>{
-    try{
-      const response = await fetch('http://localhost:5999/api/file/upload',{
+  const { account, getUser } = useUser();
+
+  const createFile = async () => {
+    try {
+      const response = await fetch('http://localhost:5999/api/file/upload', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -116,46 +117,68 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
           fileType: "folder",
           createDate: dateTime,
           isFolder: 1,
-          parentFolderId: rowId 
-       })
+          parentFolderId: rowId
+        })
       })
       const data = await response.json();
-      if(response.ok){
+      if (response.ok) {
         alert("Tạo thành công");
-      }else{
+      } else {
         alert("Tạo folder thất bại" + data.message)
       }
-    }catch(err){
-      alert("Lỗi server"+ err.message)
+    } catch (err) {
+      alert("Lỗi server" + err.message)
     }
   }
 
-    const handleSaveRename = () => {
-      if (renameValue.trim() === "") return;
+  const handleSaveRename = () => {
+    if (renameValue.trim() === "") return;
 
-      const newList = listFils.map(file => {
-        if (file.name === renamingFile) {
-          return { ...file, name: renameValue };
-        }
-        return file;
-      });
+    const newList = listFile.map(file => {
+      if (file.name === renamingFile) {
+        return { ...file, name: renameValue };
+      }
+      return file;
+    });
 
-      setListFils(newList);
-      setRenamingFile(null);
-      setSelectRow([]);
-    };
+    setlistFile(newList);
+    setRenamingFile(null);
+    setSelectRow([]);
+  };
 
-    //Lấy id của hàng mình nhấn
+  //Lấy file id của hàng mình nhấn
+  const handleRowClick = (folderId,folderName) => {
+    setPathFolder(prev => [...prev,{fileId: folderId, fileName: folderName}]);
+    setRowId(folderId);
+  }
 
-    const handleRowClick = (e)=>{
-      setRowId(e);
+  const handleFolderClick = (e,fileId,index) => {
+    // Xử lý khi người dùng nhấn vào thư mục
+    if (pathFolder.length > 1) {
+      setPathFolder(prev => prev.slice(0, index + 1)); // Xóa phần tử cuối cùng trong mảng
+      // const lastFolder = pathFolder[pathFolder.length - 2];
+      setRowId(fileId);
     }
+  }
+
+  // Đường dẫn thư mục hiện hành
+  const [pathFolder, setPathFolder] = useState([{fileId: null, fileName: fileName}]);
 
   return (
     <div className="p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-2xl font-semibold">{fileName}</h2>
+        <div className="flex items-center space-x-0">
+          
+          {/* Hiển thị đường dẫn thư mục */}
+          {pathFolder.map((path, index) => {
+            let style = (rowId !== path.fileId ? "text-gray-500 ": "" ) + "text-2xl font-semibold cursor-pointer";
+            return path.fileId === null ? <span onClick={(e) => handleFolderClick(e,path.fileId,index)}><h2 className={style}>{path.fileName}</h2></span> :
+            <span onClick={(e) => handleFolderClick(e,path.fileId,index)}><h2 className={style}>{"/" + path.fileName}</h2></span>
+          })}
+          
+        </div>
+
         <div className="flex items-center space-x-4">
           <FaRedoAlt className="cursor-pointer" />
           <FaTh className="cursor-pointer" />
@@ -215,7 +238,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
           <thead className="sticky top-0 bg-white ">
             <tr className="border-b">
               <th className="p-2 text-blue-700 w-8">
-                <input type="checkbox" checked={selectRow.length === listFils.length}
+                <input type="checkbox" checked={selectRow.length === listFile.length}
                   onChange={(e) => handleAllSelect(e.target.checked)}
                 />
               </th>
@@ -228,7 +251,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
 
             {isCreating &&
               <tr className="border-b hover:bg-gray-100">
-                <td><input type="checkbox"/></td>
+                <td><input type="checkbox" /></td>
                 <td className="p-2 flex items-center space-x-2">
                   <FaFolder className="text-yellow-500" />
                   <input
@@ -243,15 +266,18 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
                 <td className="p-2">-</td>
               </tr>
             }
-            {listFils.map((file, i) => {
+            {listFile.map((file, i) => {
               const isSelected = selectRow.includes(file.fileName);
               return (
-                <tr  onDoubleClick={file.isFolder ? () => handleRowClick(file.id) : undefined} key={i} className={`group border-b hover:bg-gray-100 ${isSelected ? 'bg-[rgb(181_227_243)]' : ''}`}>
+                // UI tập tin được hiển thị
+                <tr onDoubleClick={file.isFolder ? () => handleRowClick(file.id,file.fileName) : undefined} key={i} className={`group border-b hover:bg-gray-100 ${isSelected ? 'bg-[rgb(181_227_243)]' : ''}`}>
+                  {/* Checkbox để chọn tập tin */}
                   <td className={`p-2 text-blue-700 w-8 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:!opacity-100'} transition-opacity duration-200`}>
                     <input type="checkbox" checked={isSelected}
                       onChange={(e) => handleListSelect(file.fileName, e.target.checked)}
-                     />
+                    />
                   </td>
+                  {/* Hiển thị tên tập tin hoặc thư mục */}
                   <td className="cursor-pointer p-2 flex items-center space-x-2">
                     {file.isFolder === true ? (
                       <FaFolder className="text-yellow-500" />
@@ -272,9 +298,10 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
                     ) : (
                       <span>{file.fileName}</span>
                     )}
-
                   </td>
+                  {/* Hiển thị ngày tạo tập tin */}
                   <td className="p-2">{file.createDate}</td>
+                  {/* Hiển thị kích thước tập tin */}
                   <td className="p-2">{file.fileSize || "-"}</td>
                 </tr>
               )

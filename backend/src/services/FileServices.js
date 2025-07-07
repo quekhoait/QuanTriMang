@@ -60,8 +60,8 @@ const getUserFiles = async (userId, parentFolderId = null) => {
             WHERE userId = @userId ${parentFolderId === null ? 'AND parentFolderId IS NULL' : 'AND parentFolderId = @parentFolderId'}
         `);
         console.log('Kết quả truy vấn:', result.recordset);
-        console.log('userId:', userId);
-        console.log('parentFolderId:', parentFolderId, 'typeof:', typeof parentFolderId);
+        // console.log('userId:', userId);
+        // console.log('parentFolderId:', parentFolderId, 'typeof:', typeof parentFolderId);
         return {
             files: result.recordset
         };
@@ -91,6 +91,12 @@ const getUserFile = async (userId, fileId) => {
         throw error;
     }
 }
+
+//Xóa file/thư mục của user
+const deleteUserFile = async (userId, fileId) => {
+    
+}
+
 
 module.exports = {
     createFile,
