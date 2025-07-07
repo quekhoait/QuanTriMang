@@ -7,4 +7,18 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-module.exports = cloudinary;
+const deleteCloudinaryFile = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log("Đã xóa file Cloudinary:", result);
+    return result;
+  } catch (err) {
+    console.error("Lỗi khi xóa file Cloudinary:", err);
+    throw err;
+  }
+};
+
+module.exports = {
+  cloudinary,
+  deleteCloudinaryFile
+};

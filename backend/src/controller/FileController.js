@@ -1,6 +1,6 @@
 const FileServices = require('../services/FileServices.js');
 const streamifier = require('streamifier')
-const cloudinary = require('../../cloudinary.js');
+const {cloudinary} = require('../../cloudinary.js');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -95,11 +95,28 @@ const getUserFile = async (req,res) => {
     }
 }
 
+const deleteUserFile = async (req,res) => {
+   const userId = parseInt(req.params.userId)
+    const fileId = parseInt(req.params.fileId)
+    try{
+        const result = await FileServices.deleteUserFile(userId,fileId)
+        res.json({message : result.message})
+    }catch(err){
+        console.error('Lỗi khi xóa file: ',err)
+        res.status(500).json({
+            error: "lỗi xóa file",
+            info: err.message
+        })
+        
+    }
+}
+
 
 
 module.exports = {
     createFile,
     getUserFiles,
     getUserFile,
+    deleteUserFile
 };
 
