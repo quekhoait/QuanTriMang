@@ -7,7 +7,7 @@ const { deleteCloudinaryFile } = require('../../cloudinary');
 
 const createFile = async ({
     userId,
-    parentFolderId = null,
+    parentFolderId,
     fileName,
     fileSize = 0,
     fileType = null,
@@ -17,6 +17,10 @@ const createFile = async ({
     createDate,
     updateDate = null,
 }) => {
+
+          console.log(
+      fileName, fileSize, fileType, userId, parentFolderId, isFolder, keyPath, publicId
+    )
     try {
         await poolConnect;
         const request = pool.request();

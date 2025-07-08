@@ -10,9 +10,10 @@ const createFile = async (req, res) => {
     const fileSize = req.file?.size || 0;
     const fileType = req.file?.mimetype.trim() || null;
     const userId = req.body.userId;
-    const parentFolderId = req.body.parentFolderId || null;
+    const parentFolderId = parseInt(req.body.parentFolderId) || null;
     const isFolder = parseInt(req.body.isFolder) || 0;
     const updateDate = null;
+
 
     try {
         if (isFolder === 1) {
@@ -33,7 +34,7 @@ const createFile = async (req, res) => {
             return res.json({ message: 'Tạo thư mục thành công!', file: newFolder });
         }
 
-        // 👇 Trường hợp upload FILE
+        // // 👇 Trường hợp upload FILE
         const result = await new Promise((resolve, reject) => {
             streamifier.createReadStream(req.file.buffer).pipe(
                 cloudinary.uploader.upload_stream(
@@ -58,7 +59,7 @@ const createFile = async (req, res) => {
             createDate: new Date(),
             updateDate,
         });
-
+    
         res.json({ message: 'Tải lên thành công!', file: newFile });
     } catch (error) {
         console.error('Lỗi tải lên:', error);
@@ -80,7 +81,6 @@ const getUserFiles = async (req, res) => {
         res.status(500).json({ error: 'Lỗi khi lấy danh sách file.', info: error.message });
     }
 };
-
 
 //lấy chính xác 1 file nào đó
 const getUserFile = async (req,res) => {
