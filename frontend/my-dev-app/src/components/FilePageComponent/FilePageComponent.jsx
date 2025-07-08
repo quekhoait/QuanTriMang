@@ -24,23 +24,25 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     setlistFile(listFiles)
   }, [listFiles])
 
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
 
   const handlSaveNewFolder = () => {
     if (nameNewFolder.trim() === " ") return;
-    const newFolder = {
-      type: "folder",
-      name: nameNewFolder,
-      date: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-      }),
-      size: "-"
-    }
+
+  const newFolder = {
+    fileName: nameNewFolder,
+    fileSize: "-",
+    createDate: currentDate,
+    isFolder: true
+  };
     setDateTime(newFolder.date);
     setlistFile([newFolder, ...listFile]);
     setIsCreating(false);
-    createFile();
+    createFolder();
   }
 
   const [selectRow, setSelectRow] = useState([])
@@ -103,7 +105,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
   //Tạo folder mới
   const { account, getUser } = useUser();
 
-  const createFile = async () => {
+  const createFolder = async () => {
     try {
       const response = await fetch('http://localhost:5999/api/file/upload', {
         method: "POST",
@@ -160,6 +162,52 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
       setRowId(fileId);
     }
   }
+  //uplaod file
+  const {fileUpload, setFileUpLoad} = useState(null);
+  const fileInputRef = useRef(null);
+  const handleChooseFile = (e)=>{
+    e.preventDefault();
+    fileInputRef.current.click();
+  }  
+      const handleChangeFile = (e)=>{
+        const file = e.target.files?.[0];
+        if(!file){
+          return;
+        }
+        const result = window.confirm("Bạn chắc chắc upload file: " + file.name)
+        if(result){
+          uploadFilde(file)
+        }
+      }
+
+  const uploadFilde = async(fileUpload)=>{
+    const formData = new FormData();
+      formData.append("file", fileUpload);
+      formData.append("userId", account?.data?.id);
+      //formData.append("fileName", fileUpload.name);
+      //formData.append("fileType", fileUpload.type);
+      //formData.append("fileSize", fileUpload.size);
+      formData.append("isFolder", 0);
+      formData.append("parentFolderId", rowId);
+    try{
+        console.log(fileUpload);
+        const response = await fetch ('http://localhost:5999/api/file/upload',{
+          method: "POST",
+          credentials: 'include',
+          body: formData          
+        })
+        const data = await response.json();
+        console.log(response)
+        if (response.ok) {
+          alert("Upload file thành công");
+        } else {
+          alert("Upload file thất bại" + data.message)
+        }
+      
+    }catch(err){
+      alert("Lỗi up file" + err.message)
+    }
+  }
 
   // Đường dẫn thư mục hiện hành
   const [pathFolder, setPathFolder] = useState([{fileId: null, fileName: fileName}]);
@@ -187,7 +235,15 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
 
       {/* Action Buttons */}
       <div className="flex items-center space-x-4 mb-4">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-600">
+        
+        <input type="file"
+          style={{display: 'none'}}
+          ref={fileInputRef}
+          onChange={handleChangeFile}
+         />
+        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-600"
+          onClick={handleChooseFile}
+        >
           <span>⬆</span>
           <span>Upload</span>
         </button>

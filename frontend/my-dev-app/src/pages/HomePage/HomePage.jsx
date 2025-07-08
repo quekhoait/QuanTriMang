@@ -5,8 +5,9 @@ import NavMenuComponent from '../../components/NavMenuComponent/NavMenuComponent
 import { AllFileComponent } from '../../components/AllFileComponent/AllFileComponent';
 import ImageComponent from '../../components/ImageComponent/ImageComponent';
 import VideoComponent from '../../components/VideoComponent/VideoComponent';
-
-
+import DocumentsComponent from '../../components/DocumentsComponent/DocumentsComponent';
+import MusicComponent from '../../components/MusicComponent/MusicComponent'
+import OtherComponent from '../../components/OtherComponent/OtherComponent';
 
 const HomePage = ({event}) => {  
   const [openItem, setOpenItem] = useState('AllFile'); // ✅ quản lý trạng thái ở đây
@@ -28,7 +29,9 @@ const HomePage = ({event}) => {
             {openItem === 'AllFile' && <AllFileComponent />}
             {openItem === 'Image' &&     <ImageComponent />}
             {openItem === 'Video' &&     <VideoComponent />}
-        
+            {openItem === 'Documents' &&  <DocumentsComponent />}
+            {openItem === 'Music' &&     <MusicComponent/>}
+            {openItem === 'Other' &&  <OtherComponent />}
           </div>
         </div>
       </div>
