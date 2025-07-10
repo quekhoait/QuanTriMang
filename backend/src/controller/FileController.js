@@ -113,11 +113,12 @@ const getFileType = async(req, res)=>{
   const type = req.params.type;
   const userId = req.params.userId;
   try{
-    const result = await FileServices.getFileType(userId, type);
-    res.json({message: 'lấy file thành công', file: result.file})
+    const result = await FileServices.getFileType(userId, type)
+    res.json({message: 'lấy file thành công',
+       file: result.file})
   }catch(err){
     console.log(err);
-    res.status(500).json({error: 'Lỗi khi lấy file', info: error.message})
+    res.status(500).json({error: 'Lỗi khi lấy file', info: err.message})
   }
 }
 

@@ -84,7 +84,7 @@ const getUserFile = async (userId, fileId) => {
 		}
 
 	} catch (error) {
-		alert('Lỗi khi lấy danh sách file trong DB:', error);
+		console.error('Lỗi khi lấy danh sách file trong DB:', error);
 		throw error;
 	}
 }
@@ -94,16 +94,16 @@ const getFileType = async (userId, type) => {
 		await poolConnect;
 		const request = pool.request();
 		request.input('userId', sql.Int, userId)
-		request.input('type', sql.NVarChar, fileType);
+		request.input('fileType', sql.NVarChar, type);
 		const result = await request.query(`
-			select * from Files where userId = @userId AND fileType = @type
-			`)
-
+			SELECT * FROM Files 
+			WHERE userId = @userId 
+			AND fileType LIKE '%' + @fileType`)		
 			return {
-				fileType: result.recordset
+				file: result.recordset
 			}
 	} catch (err) {
-		alert("Lỗi khi lấy danh sách", err);
+		console.error("Lỗi khi lấy danh sách", err);
 	}
 }
 
