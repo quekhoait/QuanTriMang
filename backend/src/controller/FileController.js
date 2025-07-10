@@ -34,15 +34,31 @@ const createFile = async (req, res) => {
             return res.json({ message: 'Tạo thư mục thành công!', file: newFolder });
         }
 
-        // // 👇 Trường hợp upload FILE
+        const path = require("path");
+
+        const originalName = req.file.originalname; // Detai BaitapLon2022 (1).pdf
+        const fileNameWithExt = path.parse(originalName).base; // giữ cả tên + đuôi
+        const fileNameWithoutExt = path.parse(originalName).name;
+        const fileExt = path.parse(originalName).ext; // .pdf
+
+        const publicId = `${fileNameWithoutExt}${fileExt}`; // => Detai BaitapLon2022 (1).pdf
+
+
         const result = await new Promise((resolve, reject) => {
             streamifier.createReadStream(req.file.buffer).pipe(
                 cloudinary.uploader.upload_stream(
-                    { folder: `uploads/user_${userId}` },
+                    {
+                        folder: `uploads/user_${userId}`,
+                        public_id: publicId,                // 👈 giữ đuôi .pdf
+                        resource_type: "raw",
+                        use_filename: true,
+                        unique_filename: false,
+                        overwrite: true
+                    },
                     (error, result) => {
                         if (error) reject(error);
                         else resolve(result);
-                    }   
+                    }
                 )
             );
         });
