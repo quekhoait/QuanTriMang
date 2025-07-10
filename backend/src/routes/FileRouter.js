@@ -4,7 +4,8 @@ const {
     createFile,
     getUserFiles,
     getUserFile,
-    deleteUserFile
+    deleteUserFile,
+    getFileType
 } = require('../controller/FileController');
 
 
@@ -16,7 +17,7 @@ const upload = multer();
 router.post('/upload', upload.single('file'), createFile);
 router.get('/listFile/:userId/:parentFolderId', getUserFiles);
 router.get('/oneFile/:userId/:fileId',getUserFile);
-router.get('/deleteFile/:userId/:fileId',deleteUserFile);
-
+router.delete('/deleteFile',deleteUserFile);
+router.get('/getFileType/:userId/:type', getFileType);
 
 module.exports = router;

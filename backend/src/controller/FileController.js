@@ -62,7 +62,6 @@ const createFile = async (req, res) => {
     
         res.json({ message: 'Tải lên thành công!', file: newFile });
     } catch (error) {
-        console.error('Lỗi tải lên:', error);
         res.status(500).json({ error: 'Lỗi tải lên tệp tin/thư mục.', info: error.message });
     }
 };
@@ -96,10 +95,9 @@ const getUserFile = async (req,res) => {
 }
 
 const deleteUserFile = async (req,res) => {
-   const userId = parseInt(req.params.userId)
-    const fileId = parseInt(req.params.fileId)
+   const {userId, fileIds} = req.body;
     try{
-        const result = await FileServices.deleteUserFile(userId,fileId)
+        const result = await FileServices.deleteUserFile(userId,fileIds)
         res.json({message : result.message})
     }catch(err){
         console.error('Lỗi khi xóa file: ',err)
@@ -111,12 +109,25 @@ const deleteUserFile = async (req,res) => {
     }
 }
 
+const getFileType = async(req, res)=>{
+  const type = req.params.type;
+  const userId = req.params.userId;
+  try{
+    const result = await FileServices.getFileType(userId, type);
+    res.json({message: 'lấy file thành công', file: result.file})
+  }catch(err){
+    console.log(err);
+    res.status(500).json({error: 'Lỗi khi lấy file', info: error.message})
+  }
+}
+
 
 
 module.exports = {
     createFile,
     getUserFiles,
     getUserFile,
-    deleteUserFile
+    deleteUserFile,
+    getFileType
 };
 

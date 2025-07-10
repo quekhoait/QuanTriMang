@@ -1,22 +1,36 @@
 import { useState, useEffect, useRef, use } from "react";
-import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaTh, FaFolderOpen, FaShareAlt } from "react-icons/fa";
+import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaTh, FaFolderOpen, FaShareAlt, FaTrash, FaPencilAlt, FaImages, FaAlignCenter } from "react-icons/fa";
 import { AiOutlineFolderAdd } from "react-icons/ai";
 import { CiMenuKebab } from "react-icons/ci";
 import { FaRegStar } from "react-icons/fa6";
 import { useUser } from "../../contexts/UserContext";
+import { useFile } from "../../contexts/FileContext";
 
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
   //listFiles json dữ liệu tệp tin lấy api/file/listFile/:userId/:parentFolderId
-
+const { getListFileParent, removeFile } = useFile();
 
   //Tạo thêm folder mới
   const [isCreating, setIsCreating] = useState(false);
-  const [nameNewFolder, setNameNewFolder] = useState("New folder")
+  const [nameNewFolder, setNameNewFolder] = useState()
   const [dateTime, setDateTime] = useState();
-
+  //Lưu sô newfolder tạo ra
+const generateFolderName = () => {
+  const baseName = "New Folder";
+  let name = baseName;
+  let counter = 1;
+  const existingNames = listFile.map(f => f.fileName);
+  while (existingNames.includes(name)) {
+    name = `${baseName} ${counter}`;
+    counter++;
+  }
+  return name;
+};
   const createNewFolder = () => {
     setIsCreating(true);
-    setNameNewFolder("New Folder")
+    setIsCreating(true);
+    const uniqueName = generateFolderName();
+    setNameNewFolder(uniqueName);
   }
 
   const [listFile, setlistFile] = useState(listFiles);
@@ -30,8 +44,16 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     year: "numeric",
   });
 
+
   const handlSaveNewFolder = () => {
+    const cnt = 0;
     if (nameNewFolder.trim() === " ") return;
+    listFile.forEach(e => {
+        if(e.fileName === nameNewFolder && e.parentFolderId === rowId && e.isFolder === true){
+          alert("Tên đã tồn tại");
+          return;
+        }
+    });
 
   const newFolder = {
     fileName: nameNewFolder,
@@ -46,11 +68,14 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
   }
 
   const [selectRow, setSelectRow] = useState([])
-  const handleListSelect = (name, checked) => {
+  const [listFileId, setListFileId] = useState([]);
+  const handleListSelect = (name, checked, ListFileId) => {
     if (checked) {
       setSelectRow(prev => [...prev, name]);
+      setListFileId(prev=> [...prev, ListFileId]);
     } else {
       setSelectRow(prev => prev.filter(item => item !== name)) //lọc qua các phần tử và giữ lại phần tử khác name
+      setListFileId(prev=> prev.filter(id => id !== listFileId));
     }
   }
 
@@ -181,6 +206,11 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
       }
 
   const uploadFilde = async(fileUpload)=>{
+  const isDuplicate = listFiles.find(file => file.fileName === fileUpload.name);
+  if (isDuplicate) {
+    alert("⚠️ Tên file đã tồn tại!");
+    return; // 👉 Dừng luôn hàm nếu trùng
+  }
     const formData = new FormData();
       formData.append("file", fileUpload);
       formData.append("userId", account?.data?.id);
@@ -190,16 +220,15 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
       formData.append("isFolder", 0);
       formData.append("parentFolderId", rowId);
     try{
-        console.log(fileUpload);
         const response = await fetch ('http://localhost:5999/api/file/upload',{
           method: "POST",
           credentials: 'include',
           body: formData          
         })
         const data = await response.json();
-        console.log(response)
         if (response.ok) {
           alert("Upload file thành công");
+          getListFileParent(rowId);
         } else {
           alert("Upload file thất bại" + data.message)
         }
@@ -209,8 +238,35 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     }
   }
 
+
   // Đường dẫn thư mục hiện hành
   const [pathFolder, setPathFolder] = useState([{fileId: null, fileName: fileName}]);
+
+// const caculatorDataUser = () => {
+//   let count = 0;
+//   listFile.forEach(e => {
+//     if (e.userId === account?.data?.id) {
+//       count += e.fileSize ? parseFloat(e.fileSize) : 0;
+//     }
+//   });
+//   return +(count / (1024 * 1024 * 1024)).toFixed(2); // ✅ trả về number
+// }
+
+
+//   console.log(caculatorDataUser().typeof)
+
+  //xoa file
+
+
+  const handleDeleteFile = async()=>{
+    const result = window.confirm("Bạn chắc chắn muốn xóa?");
+    console.log(listFileId)
+    if(result && listFileId.length>0){
+      await removeFile(listFileId); 
+    }else{
+      return;
+    }
+  }
 
   return (
     <div className="p-6">
@@ -256,12 +312,12 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
 
         {selectRow.length > 0 &&
           <div className="flex items-center space-x-4 text-lg">
-            <button className="text-xl">
-              <AiOutlineFolderAdd />
+            <button className="text-xl" onClick={handleDeleteFile}>
+              <FaTrash />
             </button>
 
             <button className="">
-              <FaRegStar />
+              <FaPencilAlt />
             </button>
 
             <button className="">
@@ -271,21 +327,6 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
             <button className="">
               <FaDownload />
             </button>
-            <div className="relative" ref={menuRef}>
-              <button onClick={() => setIsOpen(!isOpen)}>
-                <CiMenuKebab />
-              </button>
-              {isOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-20">
-                  <ul className="text-sm text-gray-700">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Move</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Copy</li>
-                    {selectRow.length === 1 && <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleRename}>Rename</li>}
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
-                  </ul>
-                </div>
-              )}
-            </div>
           </div>}
       </div>
 
@@ -330,15 +371,20 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
                   {/* Checkbox để chọn tập tin */}
                   <td className={`p-2 text-blue-700 w-8 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:!opacity-100'} transition-opacity duration-200`}>
                     <input type="checkbox" checked={isSelected}
-                      onChange={(e) => handleListSelect(file.fileName, e.target.checked)}
+                      onChange={(e) => handleListSelect(file.fileName, e.target.checked, file.id)}
+                      
                     />
                   </td>
                   {/* Hiển thị tên tập tin hoặc thư mục */}
                   <td className="cursor-pointer p-2 flex items-center space-x-2">
-                    {file.isFolder === true ? (
+                    {file.isFolder ? (
                       <FaFolder className="text-yellow-500" />
-                    ) : (
+                    ) : file.fileType?.includes("pdf") ? (
                       <FaFilePdf className="text-red-500" />
+                    ) : file.fileType?.includes("image") ? (
+                      <FaImages className="text-blue-500" />
+                    ) : (
+                      <FaAlignCenter className="text-gray-500" />
                     )}
                     {renamingFile === file.fileName ? (
                       <input

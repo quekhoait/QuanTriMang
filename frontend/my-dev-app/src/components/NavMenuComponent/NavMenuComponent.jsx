@@ -60,7 +60,7 @@ const NavMenuComponent = ({openItem, onChangeItem}) => {
       />
         {/* Progress bar */}
         <div className="w-full mt-auto justify-center">
-          <div className="text-gray-700 pb-[12px]">admin@gmail.com</div>
+          <div className="text-gray-700 pb-[12px]">admin@gmail.com | 0,23 / 1gb</div>
             <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
               <div className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full w-[45%]"> 45%</div>
             </div>

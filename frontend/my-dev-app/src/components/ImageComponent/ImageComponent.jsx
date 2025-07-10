@@ -1,20 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import FilePageComponent from '../FilePageComponent/FilePageComponent'
+import { useFile } from '../../contexts/FileContext';
 
 const ImageComponent = () => {
-  const filesImage = [
-      { name: "video", date: "Mar 07", type: "folder" },
-  { name: "AI", date: "Dec 05,2024", type: "folder" },
-  { name: "img_video", date: "Dec 05,2024", type: "folder" },
-  { name: "ae", date: "Sep 30,2024", type: "folder" },
-  { name: "MMT", date: "Jul 20,2024", type: "folder" },
-  { name: "From:  SM-A325F", date: "Jun 25,2024", type: "folder" },
-  { name: "SổtayBắtđầuTeraBox.pdf", date: "Jun 25,2024", size: "44.38MB", type: "pdf" },
-  ]
+  const {fileImage, listFileImgae} = useState();
+    const {listFileParent, getListFileParent} = useFile();
+  console.log(listFileParent)
+
+  // listFiles.forEach(element => {
+    
+  // });
+
   return (
     <div>
       <FilePageComponent 
-              listFiles={filesImage}
+              listFiles={fileImage}
               fileName={"Image"}
               isAllFile={false}
             />
