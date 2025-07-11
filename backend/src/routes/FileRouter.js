@@ -6,9 +6,7 @@ const {
     getUserFile,
     deleteUserFile,
     getFileType,
-    shareFile,
-    getFileShare,
-    getFileReceive
+
 } = require('../controller/FileController');
 
 
@@ -22,7 +20,6 @@ router.get('/listFile/:userId/:parentFolderId', getUserFiles);
 router.get('/oneFile/:userId/:fileId',getUserFile);
 router.delete('/deleteFile',deleteUserFile);
 router.get('/getFileType/:userId/:type', getFileType);
-r
 
 
 module.exports = router;
