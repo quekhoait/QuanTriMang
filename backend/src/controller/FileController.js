@@ -137,49 +137,7 @@ const getFileType = async(req, res)=>{
   }
 }
 
-const shareFile = async(req, res)=>{
-  const userId = parseInt(req.params.userId);
-  const fileId = parseInt(req.params.fileId);
-  const userIdRece = parseInt(req.params.userIdRece);
-  try{
-    const result = await FileServices.shareFile(userId, fileId, userIdRece);
-    res.json({
-      message: "Chia sẻ thành công",
-      file: result.file
-    })
-  }catch(err){
-    console.error(err.message);
-    res.status(500).json({error: 'Lỗi khi chuyển file', info: err.message});
-  }
-}
 
-const getFileShare = async(req, res)=>{
-    const userId = parseInt(req.params.userId);
-  try{
-    const result = await FileServices.getFileShare(userId);
-    res.json({
-      message: "Lấy file thành công",
-      file: result.file
-    })
-  }catch(err){
-    console.error(err.message);
-    res.status(500).json({error: 'Lỗi khi chuyển file', info: err.message});
-  }
-}
-
-const getFileReceive = async(req, res)=>{
-    const userIdRece = parseInt(req.params.userIdRece);
-  try{
-    const result = await FileServices.getFileReceive(userIdRece);
-    res.json({
-      message: "Lấy file thành công",
-      file: result.file
-    })
-  }catch(err){
-    console.error(err.message);
-    res.status(500).json({error: 'Lỗi khi chuyển file', info: err.message});
-  }
-}
 
 module.exports = {
     createFile,
@@ -187,8 +145,5 @@ module.exports = {
     getUserFile,
     deleteUserFile,
     getFileType,
-    shareFile,
-    getFileShare,
-    getFileReceive
 };
 
