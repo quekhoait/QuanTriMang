@@ -91,22 +91,36 @@ const getUserFile = async (userId, fileId) => {
 
 const getFileType = async (userId, type) => {
 	try {
+
+		documentTypes = ['document', 'msword', 'pdf'];
 		await poolConnect;
 		const request = pool.request();
 		request.input('userId', sql.Int, userId)
-    let query = `SELECT * FROM Files WHERE userId = @userId `;
-    if (type !== 'null') {
-      query += ` AND fileType LIKE '%' + @fileType + '%'`;
-      request.input('fileType', sql.NVarChar, type);
-    }
+		let query = `SELECT * FROM Files WHERE userId = @userId `;
+
+		if (type === 'document') {
+			const conditions = documentTypes.map((ext, index) => {
+				const param = `fileType${index}`;
+				request.input(param, sql.NVarChar, `%${ext}`);
+				demo = `fileType LIKE @${param}`
+				console.log('==========' + demo);
+
+				return `fileType LIKE @${param}`;
+			});
+			query += `AND (${conditions.join(' OR ')})`;
+		}
+		else if (type !== 'null') {
+			query += ` AND fileType LIKE '%' + @fileType + '%'`;
+			request.input('fileType', sql.NVarChar, type);
+		}
 		const result = await request.query(query);
-          console.log(result)
-			return {
-				file: result.recordset
-			}
+		console.log(result)
+		return {
+			file: result.recordset
+		}
 
 	} catch (err) {
-		console.error("Lỗi khi lấy danh sách", err);
+		console.error("Lỗi khi lấy danh sách loại file", err);
 	}
 }
 
