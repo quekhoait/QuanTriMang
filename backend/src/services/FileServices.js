@@ -104,6 +104,10 @@ const getFileType = async (userId, type) => {
 				const param = `fileType${index}`;
 				request.input(param, sql.NVarChar, `%${ext}`);
 				demo = `fileType LIKE @${param}`
+<<<<<<< HEAD
+=======
+				console.log('==========' + demo);
+>>>>>>> 318d4c846f59a0244d228e99a0e33d562ddf8189
 
 				return `fileType LIKE @${param}`;
 			});
@@ -114,7 +118,11 @@ const getFileType = async (userId, type) => {
 			request.input('fileType', sql.NVarChar, type);
 		}
 		const result = await request.query(query);
+<<<<<<< HEAD
 
+=======
+		console.log(result)
+>>>>>>> 318d4c846f59a0244d228e99a0e33d562ddf8189
 		return {
 			file: result.recordset
 		}
