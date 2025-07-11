@@ -89,7 +89,6 @@ const getUserFiles = async (req, res) => {
     const parentFolderId = req.params.parentFolderId === 'NULL' ? null : parseInt(req.params.parentFolderId);
     try {
         const result = await FileServices.getUserFiles(userId, parentFolderId);
-      console.log("result: ", result)
         res.json({ message: 'Lấy danh sách tệp thành công', files: result.files });
     } catch (error) {
         console.error('Lỗi khi lấy danh sách file:', error);

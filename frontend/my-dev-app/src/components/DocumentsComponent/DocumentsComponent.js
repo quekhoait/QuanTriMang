@@ -1,20 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import FilePageComponent from '../FilePageComponent/FilePageComponent'
+import { useFile } from '../../contexts/FileContext';
+import { useUser } from '../../contexts/UserContext';
 
 const DocumentsComponent = () => {
-    const filesImage = [
-      { name: "video", date: "Mar 07", type: "folder" },
-  { name: "AI", date: "Dec 05,2024", type: "folder" },
-  { name: "img_video", date: "Dec 05,2024", type: "folder" },
-  { name: "ae", date: "Sep 30,2024", type: "folder" },
-  { name: "MMT", date: "Jul 20,2024", type: "folder" },
-  { name: "From:  SM-A325F", date: "Jun 25,2024", type: "folder" },
-  { name: "SổtayBắtđầuTeraBox.pdf", date: "Jun 25,2024", size: "44.38MB", type: "pdf" },
-  ]
+  const {listFileType, getFileType} = useFile();
+    const { account, getUser } = useUser();
+  
+  useEffect(() => {
+    if (account?.data?.id != null) {
+      getFileType("msword"); // hoặc
+      getFileType("pdf");
+      getFileType("document")
+    }
+  }, [account?.data?.id]);
   return (
       <div>
         <FilePageComponent 
-            listFiles={filesImage}
+            listFiles={listFileType}
             fileName={"Documents"}
             isAllFile={false}
             />

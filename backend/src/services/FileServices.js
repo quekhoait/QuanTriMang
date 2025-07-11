@@ -94,14 +94,17 @@ const getFileType = async (userId, type) => {
 		await poolConnect;
 		const request = pool.request();
 		request.input('userId', sql.Int, userId)
-		request.input('fileType', sql.NVarChar, type);
-		const result = await request.query(`
-			SELECT * FROM Files 
-			WHERE userId = @userId 
-			AND fileType LIKE '%' + @fileType`)		
+    let query = `SELECT * FROM Files WHERE userId = @userId `;
+    if (type !== 'null') {
+      query += ` AND fileType LIKE '%' + @fileType + '%'`;
+      request.input('fileType', sql.NVarChar, type);
+    }
+		const result = await request.query(query);
+          console.log(result)
 			return {
 				file: result.recordset
 			}
+
 	} catch (err) {
 		console.error("Lỗi khi lấy danh sách", err);
 	}

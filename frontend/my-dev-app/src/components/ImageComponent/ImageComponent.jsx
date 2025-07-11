@@ -1,20 +1,26 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FilePageComponent from '../FilePageComponent/FilePageComponent'
 import { useFile } from '../../contexts/FileContext';
+import { useUser } from '../../contexts/UserContext';
 
 const ImageComponent = () => {
-  const {fileImage, listFileImgae} = useState();
-    const {listFileParent, getListFileParent} = useFile();
-  console.log(listFileParent)
 
-  // listFiles.forEach(element => {
-    
-  // });
+  const {listFileType, getFileType} = useFile();
+  const { account, getUser } = useUser();
+
+
+console.log(account?.data?.id)
+useEffect(() => {
+  if (account?.data?.id != null) {
+    getFileType("image"); // ✔️ truyền đúng rowId
+  }
+}, [account?.data?.id]);
+
 
   return (
     <div>
       <FilePageComponent 
-              listFiles={fileImage}
+              listFiles={listFileType}
               fileName={"Image"}
               isAllFile={false}
             />
