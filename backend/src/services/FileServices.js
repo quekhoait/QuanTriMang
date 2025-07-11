@@ -4,6 +4,7 @@ const {
 	poolConnect
 } = require('../../db');
 const { deleteCloudinaryFile } = require('../../cloudinary');
+const { request } = require('express');
 
 const createFile = async ({
 	userId,
@@ -91,22 +92,35 @@ const getUserFile = async (userId, fileId) => {
 
 const getFileType = async (userId, type) => {
 	try {
+
+		documentTypes = ['document', 'msword', 'pdf'];
 		await poolConnect;
 		const request = pool.request();
 		request.input('userId', sql.Int, userId)
-    let query = `SELECT * FROM Files WHERE userId = @userId `;
-    if (type !== 'null') {
-      query += ` AND fileType LIKE '%' + @fileType + '%'`;
-      request.input('fileType', sql.NVarChar, type);
-    }
+		let query = `SELECT * FROM Files WHERE userId = @userId `;
+
+		if (type === 'document') {
+			const conditions = documentTypes.map((ext, index) => {
+				const param = `fileType${index}`;
+				request.input(param, sql.NVarChar, `%${ext}`);
+				demo = `fileType LIKE @${param}`
+
+				return `fileType LIKE @${param}`;
+			});
+			query += `AND (${conditions.join(' OR ')})`;
+		}
+		else if (type !== 'null') {
+			query += ` AND fileType LIKE '%' + @fileType + '%'`;
+			request.input('fileType', sql.NVarChar, type);
+		}
 		const result = await request.query(query);
-          console.log(result)
-			return {
-				file: result.recordset
-			}
+
+		return {
+			file: result.recordset
+		}
 
 	} catch (err) {
-		console.error("Lỗi khi lấy danh sách", err);
+		console.error("Lỗi khi lấy danh sách loại file", err);
 	}
 }
 
@@ -200,11 +214,80 @@ const deleteUserFile = async (userId, listfileId) => {
 
 }
 
+const shareFile = async(userId, fileId, userIdRece)=>{
+  const createDate = new Date();
+  try{
+    await poolConnect;
+    const request =pool.request();
+    request.input('userId', sql.Int, userId)
+    request.input('fileId', sql.Int, fileId)
+    request.input('userIdReceive', sql.Int, userIdRece)
+	  request.input('createDate', sql.DateTime, createDate);
+    		const result = await request.query(`
+            INSERT INTO FileShare (userId, fileId, userIdReceive, createDate)
+            VALUES (@userId, @fileId, @userIdReceive, @createDate);
+            SELECT * FROM FileShare WHERE id = SCOPE_IDENTITY();
+        `);
+  return {
+			file: result.recordset[0]
+		};
+  }catch(err){
+    console.error('Lỗi khi lấy danh sách file trong DB:', err);
+		return {
+			message: "Lỗi truy vấn cơ sở dữ liệu khi xóa file: " + err
+		}
+  }
+}
+
+
+//lấy file đang share
+const getFileShare = async(userId)=>{
+try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('userId', sql.Int, userId);
+		const result = await request.query(`
+            select * from FileShare where userId = @userId 
+            `)
+
+		return {
+			file: result.recordset
+		}
+
+	} catch (error) {
+		console.error('Lỗi khi lấy danh sách file trong DB:', error);
+		throw error;
+	}
+}
+
+
+//lấy file nhận dc
+const getFileReceive = async(userIdRece)=>{
+try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('userIdReceive', sql.Int, userIdRece);
+		const result = await request.query(`
+            select * from FileShare where userIdReceive = @userIdReceive 
+            `)
+
+		return {
+			file: result.recordset
+		}
+
+	} catch (error) {
+		console.error('Lỗi khi lấy danh sách file trong DB:', error);
+		throw error;
+	}
+}
 
 module.exports = {
 	createFile,
 	getUserFiles,
 	getUserFile,
 	deleteUserFile,
-	getFileType
+	getFileType,
+  shareFile,
+  getFileShare,
+  getFileReceive
 };
