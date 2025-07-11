@@ -9,8 +9,6 @@ const DocumentsComponent = () => {
   
   useEffect(() => {
     if (account?.data?.id != null) {
-      getFileType("msword"); // hoặc
-      getFileType("pdf");
       getFileType("document")
     }
   }, [account?.data?.id]);

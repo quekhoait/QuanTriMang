@@ -13,9 +13,10 @@ export const FileProvider = ({ children }) => {
     const [listFileType, setListFileType] = useState([]);
     const { account, getUser } = useUser();
     const [rowId, setRowId] = useState(null); // ✅ tách riêng rowId
+    const userId = account?.data?.id;
 
-    const getListFileParent = async (rowId) => {
-        const userId = account?.data?.id;
+
+    const getListFileParent = async (rowId) => {  
         const parentFolderId = rowId === undefined ? null : rowId;
         try {
             const response = await fetch(`http://localhost:5999/api/file/listFile/${userId}/${parentFolderId === null ? 'NULL' : rowId}`, {
@@ -48,7 +49,6 @@ export const FileProvider = ({ children }) => {
     }
 
     const getFileType = async(type)=>{
-      const userId = account?.data?.id;
       try{
         const response = await fetch(`http://localhost:5999/api/file/getFileType/${userId}/${type}`,{
           method: "GET",
@@ -67,7 +67,6 @@ export const FileProvider = ({ children }) => {
     }
 
     const removeFile = async (listFileId) => {
-        const userId = account?.data?.id;
         try {
             const response = await fetch("http://localhost:5999/api/file/deleteFile", {
                 method: "DELETE",
@@ -94,7 +93,7 @@ export const FileProvider = ({ children }) => {
         }
     };
 
-
+    
 
 
     // useEffect(() => {
@@ -107,7 +106,8 @@ export const FileProvider = ({ children }) => {
 
 
     return (
-        <UserContext.Provider value={{ listFileParent, getListFileParent, rowId, setRowId, removeFile, listFileType, getFileType}}>
+        <UserContext.Provider value={{ listFileParent, getListFileParent, rowId, setRowId,
+         removeFile, listFileType, getFileType}}>
             {children}
         </UserContext.Provider>
     );

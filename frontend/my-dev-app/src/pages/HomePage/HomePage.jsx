@@ -8,6 +8,7 @@ import VideoComponent from '../../components/VideoComponent/VideoComponent';
 import DocumentsComponent from '../../components/DocumentsComponent/DocumentsComponent';
 import MusicComponent from '../../components/MusicComponent/MusicComponent'
 import OtherComponent from '../../components/OtherComponent/OtherComponent';
+import FileShareComponent from '../../components/FileShareComponent/FileShareComponent';
 
 const HomePage = ({event}) => {  
   const [openItem, setOpenItem] = useState('AllFile'); // ✅ quản lý trạng thái ở đây
@@ -32,6 +33,7 @@ const HomePage = ({event}) => {
             {openItem === 'Documents' &&  <DocumentsComponent />}
             {openItem === 'Music' &&     <MusicComponent/>}
             {openItem === 'Other' &&  <OtherComponent />}
+            {openItem === 'FileShare' &&  <FileShareComponent />}
           </div>
         </div>
       </div>

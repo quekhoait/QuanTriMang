@@ -115,6 +115,8 @@ useEffect(() => {
                   <FormAuthenComponent 
                     onSuccess={handleEdit}
                     onClose={handleShowForm}
+                    mess={"Mật khẩu"}
+                    notification={"Yêu cầu xác thực"}
                   />
                   )
                 }

@@ -1,31 +1,32 @@
 import { useState, useEffect, useRef, use } from "react";
-import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaTh, FaFolderOpen, FaShareAlt, FaTrash, FaPencilAlt, FaImages, FaAlignCenter } from "react-icons/fa";
+import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaTh, FaFolderOpen, FaShareAlt, FaTrash, FaPencilAlt, FaImages, FaAlignCenter, FaPhotoVideo } from "react-icons/fa";
 import { AiOutlineFolderAdd } from "react-icons/ai";
 import { CiMenuKebab } from "react-icons/ci";
 import { FaRegStar } from "react-icons/fa6";
 import { useUser } from "../../contexts/UserContext";
 import { useFile } from "../../contexts/FileContext";
+import FormAuthenComponent from "../FormAuthenComponent/FormAuthenComponent";
 
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
   //listFiles json dữ liệu tệp tin lấy api/file/listFile/:userId/:parentFolderId
-const { getListFileParent, removeFile } = useFile();
+  const { getListFileParent, removeFile } = useFile();
 
   //Tạo thêm folder mới
   const [isCreating, setIsCreating] = useState(false);
   const [nameNewFolder, setNameNewFolder] = useState()
   const [dateTime, setDateTime] = useState();
   //Lưu sô newfolder tạo ra
-const generateFolderName = () => {
-  const baseName = "New Folder";
-  let name = baseName;
-  let counter = 1;
-  const existingNames = listFile.map(f => f.fileName);
-  while (existingNames.includes(name)) {
-    name = `${baseName} ${counter}`;
-    counter++;
-  }
-  return name;
-};
+  const generateFolderName = () => {
+    const baseName = "New Folder";
+    let name = baseName;
+    let counter = 1;
+    const existingNames = listFile.map(f => f.fileName);
+    while (existingNames.includes(name)) {
+      name = `${baseName} ${counter}`;
+      counter++;
+    }
+    return name;
+  };
   const createNewFolder = () => {
     setIsCreating(true);
     setIsCreating(true);
@@ -49,18 +50,18 @@ const generateFolderName = () => {
     const cnt = 0;
     if (nameNewFolder.trim() === " ") return;
     listFile.forEach(e => {
-        if(e.fileName === nameNewFolder && e.parentFolderId === rowId && e.isFolder === true){
-          alert("Tên đã tồn tại");
-          return;
-        }
+      if (e.fileName === nameNewFolder && e.parentFolderId === rowId && e.isFolder === true) {
+        alert("Tên đã tồn tại");
+        return;
+      }
     });
 
-  const newFolder = {
-    fileName: nameNewFolder,
-    fileSize: "-",
-    createDate: currentDate,
-    isFolder: true
-  };
+    const newFolder = {
+      fileName: nameNewFolder,
+      fileSize: "-",
+      createDate: currentDate,
+      isFolder: true
+    };
     setDateTime(newFolder.date);
     setlistFile([newFolder, ...listFile]);
     setIsCreating(false);
@@ -72,10 +73,10 @@ const generateFolderName = () => {
   const handleListSelect = (name, checked, ListFileId) => {
     if (checked) {
       setSelectRow(prev => [...prev, name]);
-      setListFileId(prev=> [...prev, ListFileId]);
+      setListFileId(prev => [...prev, ListFileId]);
     } else {
       setSelectRow(prev => prev.filter(item => item !== name)) //lọc qua các phần tử và giữ lại phần tử khác name
-      setListFileId(prev=> prev.filter(id => id !== listFileId));
+      setListFileId(prev => prev.filter(id => id !== listFileId));
     }
   }
 
@@ -174,12 +175,12 @@ const generateFolderName = () => {
   };
 
   //Lấy file id của hàng mình nhấn
-  const handleRowClick = (folderId,folderName) => {
-    setPathFolder(prev => [...prev,{fileId: folderId, fileName: folderName}]);
+  const handleRowClick = (folderId, folderName) => {
+    setPathFolder(prev => [...prev, { fileId: folderId, fileName: folderName }]);
     setRowId(folderId);
   }
 
-  const handleFolderClick = (e,fileId,index) => {
+  const handleFolderClick = (e, fileId, index) => {
     // Xử lý khi người dùng nhấn vào thư mục
     if (pathFolder.length > 1) {
       setPathFolder(prev => prev.slice(0, index + 1)); // Xóa phần tử cuối cùng trong mảng
@@ -188,99 +189,139 @@ const generateFolderName = () => {
     }
   }
   //uplaod file
-  const {fileUpload, setFileUpLoad} = useState(null);
+  const { fileUpload, setFileUpLoad } = useState(null);
   const fileInputRef = useRef(null);
-  const handleChooseFile = (e)=>{
+  const handleChooseFile = (e) => {
     e.preventDefault();
     fileInputRef.current.click();
-  }  
-      const handleChangeFile = (e)=>{
-        const file = e.target.files?.[0];
-        if(!file){
-          return;
-        }
-        const result = window.confirm("Bạn chắc chắc upload file: " + file.name)
-        if(result){
-          uploadFilde(file)
-        }
+  }
+  const handleChangeFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    const result = window.confirm("Bạn chắc chắc upload file: " + file.name)
+    if (result) {
+      uploadFilde(file)
+    }
+  }
+
+  const uploadFilde = async (fileUpload) => {
+    const isDuplicate = listFiles.find(file => file.fileName === fileUpload.name);
+    if (isDuplicate) {
+      alert("⚠️ Tên file đã tồn tại!");
+      return; // 👉 Dừng luôn hàm nếu trùng
+    }
+    const formData = new FormData();
+    formData.append("file", fileUpload);
+    formData.append("userId", account?.data?.id);
+    //formData.append("fileName", fileUpload.name);
+    //formData.append("fileType", fileUpload.type);
+    //formData.append("fileSize", fileUpload.size);
+    formData.append("isFolder", 0);
+    formData.append("parentFolderId", rowId);
+    try {
+      const response = await fetch('http://localhost:5999/api/file/upload', {
+        method: "POST",
+        credentials: 'include',
+        body: formData
+      })
+      const data = await response.json();
+      if (response.ok) {
+        alert("Upload file thành công");
+        getListFileParent(rowId);
+      } else {
+        alert("Upload file thất bại" + data.message)
       }
 
-  const uploadFilde = async(fileUpload)=>{
-  const isDuplicate = listFiles.find(file => file.fileName === fileUpload.name);
-  if (isDuplicate) {
-    alert("⚠️ Tên file đã tồn tại!");
-    return; // 👉 Dừng luôn hàm nếu trùng
-  }
-    const formData = new FormData();
-      formData.append("file", fileUpload);
-      formData.append("userId", account?.data?.id);
-      //formData.append("fileName", fileUpload.name);
-      //formData.append("fileType", fileUpload.type);
-      //formData.append("fileSize", fileUpload.size);
-      formData.append("isFolder", 0);
-      formData.append("parentFolderId", rowId);
-    try{
-        const response = await fetch ('http://localhost:5999/api/file/upload',{
-          method: "POST",
-          credentials: 'include',
-          body: formData          
-        })
-        const data = await response.json();
-        if (response.ok) {
-          alert("Upload file thành công");
-          getListFileParent(rowId);
-        } else {
-          alert("Upload file thất bại" + data.message)
-        }
-      
-    }catch(err){
+    } catch (err) {
       alert("Lỗi up file" + err.message)
     }
   }
 
 
   // Đường dẫn thư mục hiện hành
-  const [pathFolder, setPathFolder] = useState([{fileId: null, fileName: fileName}]);
+  const [pathFolder, setPathFolder] = useState([{ fileId: null, fileName: fileName }]);
 
-// const caculatorDataUser = () => {
-//   let count = 0;
-//   listFile.forEach(e => {
-//     if (e.userId === account?.data?.id) {
-//       count += e.fileSize ? parseFloat(e.fileSize) : 0;
-//     }
-//   });
-//   return +(count / (1024 * 1024 * 1024)).toFixed(2); // ✅ trả về number
-// }
+  // const caculatorDataUser = () => {
+  //   let count = 0;
+  //   listFile.forEach(e => {
+  //     if (e.userId === account?.data?.id) {
+  //       count += e.fileSize ? parseFloat(e.fileSize) : 0;
+  //     }
+  //   });
+  //   return +(count / (1024 * 1024 * 1024)).toFixed(2); // ✅ trả về number
+  // }
 
 
-//   console.log(caculatorDataUser().typeof)
+  //   console.log(caculatorDataUser().typeof)
 
   //xoa file
 
 
-  const handleDeleteFile = async()=>{
+  const handleDeleteFile = async () => {
     const result = window.confirm("Bạn chắc chắn muốn xóa?");
     console.log(listFileId)
-    if(result && listFileId.length>0){
-      await removeFile(listFileId); 
-    }else{
+    if (result && listFileId.length > 0) {
+      await removeFile(listFileId);
+    } else {
       return;
     }
   }
 
+  //Xử lý share dữ liệu
+
+const [isShowForm, setIsShowForm] = useState(false);
+const [isShowFormInfo, setIsShowFormInfo] = useState(false);
+
+// Toggle
+const handleShowForm = () => setIsShowForm(prev => !prev);
+const handleShowFormInfo = () => setIsShowFormInfo(prev => !prev);
+
+// Xác thực thành công => ẩn xác thực, hiện form nhập email
+const handleEdit = () => {
+  setIsShowForm(false);     // Ẩn form xác thực
+  setIsShowFormInfo(true);  // Mở form nhập email chia sẻ
+};
+
+const handleShareData = () => {
+  setIsShowForm(true); // Bắt đầu bằng việc xác thực
+};
+
   return (
     <div className="p-6">
       {/* Header */}
+      {isShowForm && (
+                  <FormAuthenComponent 
+                    onSuccess={handleEdit}
+                    onClose={handleShowForm}
+                    mess={"Mật khẩu"}
+                    notification={"Yêu cầu xác thực"}
+                  />
+                  )
+                }
+    {isShowFormInfo && (
+      <FormAuthenComponent
+        onSuccess={() => {
+          setIsShowFormInfo(false);
+          console.log("Chia sẻ thành công!");
+        }}
+        onClose={handleShowFormInfo}
+        notification={"Nhập email người muốn chia sẻ"}
+        mess={"Email"}
+      />
+    )}
+      
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-0">
-          
+
           {/* Hiển thị đường dẫn thư mục */}
           {pathFolder.map((path, index) => {
-            let style = (rowId !== path.fileId ? "text-gray-500 ": "" ) + "text-2xl font-semibold cursor-pointer";
-            return path.fileId === null ? <span onClick={(e) => handleFolderClick(e,path.fileId,index)}><h2 className={style}>{path.fileName}</h2></span> :
-            <span onClick={(e) => handleFolderClick(e,path.fileId,index)}><h2 className={style}>{"/" + path.fileName}</h2></span>
+            let style = (rowId !== path.fileId ? "text-gray-500 " : "") + "text-2xl font-semibold cursor-pointer";
+            return path.fileId === null ? <span onClick={(e) => handleFolderClick(e, path.fileId, index)}><h2 className={style}>{path.fileName}</h2></span> :
+              <span onClick={(e) => handleFolderClick(e, path.fileId, index)}><h2 className={style}>{"/" + path.fileName}</h2></span>
           })}
-          
+
         </div>
 
         <div className="flex items-center space-x-4">
@@ -291,12 +332,12 @@ const generateFolderName = () => {
 
       {/* Action Buttons */}
       <div className="flex items-center space-x-4 mb-4">
-        
+
         <input type="file"
-          style={{display: 'none'}}
+          style={{ display: 'none' }}
           ref={fileInputRef}
           onChange={handleChangeFile}
-         />
+        />
         <button className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-600"
           onClick={handleChooseFile}
         >
@@ -312,15 +353,15 @@ const generateFolderName = () => {
 
         {selectRow.length > 0 &&
           <div className="flex items-center space-x-4 text-lg">
-            <button className="text-xl" onClick={handleDeleteFile}>
+            <button className="text-xl" onClick={handleDeleteFile} >
               <FaTrash />
             </button>
 
-            <button className="">
+            <button className="" onClick={handleRename}>
               <FaPencilAlt />
             </button>
 
-            <button className="">
+            <button className="" onClick={handleShareData}>
               <FaShareAlt />
             </button>
 
@@ -367,12 +408,12 @@ const generateFolderName = () => {
               const isSelected = selectRow.includes(file.fileName);
               return (
                 // UI tập tin được hiển thị
-                <tr onDoubleClick={file.isFolder ? () => handleRowClick(file.id,file.fileName) : undefined} key={i} className={`group border-b hover:bg-gray-100 ${isSelected ? 'bg-[rgb(181_227_243)]' : ''}`}>
+                <tr onDoubleClick={file.isFolder ? () => handleRowClick(file.id, file.fileName) : undefined} key={i} className={`group border-b hover:bg-gray-100 ${isSelected ? 'bg-[rgb(181_227_243)]' : ''}`}>
                   {/* Checkbox để chọn tập tin */}
                   <td className={`p-2 text-blue-700 w-8 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:!opacity-100'} transition-opacity duration-200`}>
                     <input type="checkbox" checked={isSelected}
                       onChange={(e) => handleListSelect(file.fileName, e.target.checked, file.id)}
-                      
+
                     />
                   </td>
                   {/* Hiển thị tên tập tin hoặc thư mục */}
@@ -383,6 +424,8 @@ const generateFolderName = () => {
                       <FaFilePdf className="text-red-500" />
                     ) : file.fileType?.includes("image") ? (
                       <FaImages className="text-blue-500" />
+                    ) : file.fileType?.includes("video") ? (
+                      <FaPhotoVideo className="text-blue-500" />
                     ) : (
                       <FaAlignCenter className="text-gray-500" />
                     )}

@@ -4,70 +4,69 @@ import { FaAddressBook, FaEllipsisH, FaImages, FaMusic, FaPhotoVideo, FaRegFileA
 import HomePage from '../../pages/HomePage/HomePage'
 import { useUser } from '../../contexts/UserContext'
 
-const NavMenuComponent = ({openItem, onChangeItem}) => {
+const NavMenuComponent = ({ openItem, onChangeItem }) => {
 
-  const {account, getUser} = useUser();
+  const { account, getUser } = useUser();
 
   return (
     <div>
       <div className="pb-[16px] border-b-[2px] border-blue-400">
-      <MenuItemComponent 
-          fileName = {"All file"}
-          img = {FaRegFileAlt}
+        <MenuItemComponent
+          fileName={"All file"}
+          img={FaRegFileAlt}
           onClick={() => onChangeItem('AllFile')}
           flag={openItem === 'AllFile'}
-      />
-      <MenuItemComponent 
-          fileName = {"Image"}
-          img = {FaImages}
+        />
+        <MenuItemComponent
+          fileName={"Image"}
+          img={FaImages}
           onClick={() => onChangeItem('Image')}
           flag={openItem === 'Image'}
-      />
-      <MenuItemComponent 
-          fileName = {"Video"}
-          img = {FaPhotoVideo}
-          onClick = {()=>onChangeItem('Video')}
+        />
+        <MenuItemComponent
+          fileName={"Video"}
+          img={FaPhotoVideo}
+          onClick={() => onChangeItem('Video')}
           flag={openItem === 'Video'}
-      />
-      <MenuItemComponent 
-          fileName = {"Documents"}
-          img = {FaAddressBook}
-          onClick = {()=>onChangeItem('Documents')}
+        />
+        <MenuItemComponent
+          fileName={"Documents"}
+          img={FaAddressBook}
+          onClick={() => onChangeItem('Documents')}
           flag={openItem === 'Documents'}
-      />
-      <MenuItemComponent 
-          fileName = {"Music"}
-          img = {FaMusic}
-          onClick = {()=>onChangeItem('Music')}
+        />
+        <MenuItemComponent
+          fileName={"Music"}
+          img={FaMusic}
+          onClick={() => onChangeItem('Music')}
           flag={openItem === 'Music'}
-      />
-      <MenuItemComponent 
-          fileName = {"Orther"}
-          img = {FaEllipsisH}
-          onClick = {()=>onChangeItem('Orther')}
+        />
+        <MenuItemComponent
+          fileName={"Orther"}
+          img={FaEllipsisH}
+          onClick={() => onChangeItem('Orther')}
           flag={openItem === 'Orther'}
-      />
-      
-    </div>
+        />
+      </div>
 
-    <div className="pt-[16px] h-[300px]">
+      <div className="pt-[16px] h-[300px]">
         <div className="flex flex-col items-center justify-between rounded-md h-[100%]">
-        <MenuItemComponent 
-          fileName = {"File share"}
-          img = {FaEllipsisH}
-          onClick = {()=>onChangeItem('FileShare')}
-          flag={openItem === 'FileShare'}
-      />
-        {/* Progress bar */}
-        <div className="w-full mt-auto justify-center">
-          <div className="text-gray-700 pb-[12px]">admin@gmail.com | 0,23 / 1gb</div>
+          <MenuItemComponent
+            fileName={"File share"}
+            img={FaEllipsisH}
+            onClick={() => onChangeItem('FileShare')}
+            flag={openItem === 'FileShare'}
+          />
+          {/* Progress bar */}
+          <div className="w-full mt-auto justify-center">
+            <div className="text-gray-700 pb-[12px]">admin@gmail.com | 0,23 / 1gb</div>
             <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
               <div className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full w-[45%]"> 45%</div>
             </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   )
 }
 
