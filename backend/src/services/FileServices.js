@@ -90,29 +90,55 @@ const getUserFile = async (userId, fileId) => {
 	}
 }
 
+const getConditions = (request, listType) => {
+	let conditions = [];
+	listType.map((ext, index) => {
+		const param = `fileType${index}`;
+		request.input(param, sql.NVarChar, `%${ext}`);
+		conditions.push(`fileType LIKE @${param}`);
+	});
+	return `AND (${conditions.join(' OR ')})`;
+}
+
+const getNegativeConditions = (request, listType) => {
+	let conditions = [];
+	listType.map((ext, index) => {
+		const param = `fileType${index}`;
+		request.input(param, sql.NVarChar, `%${ext}`);
+		conditions.push(`fileType NOT LIKE @${param}`);
+	});
+	return `AND (${conditions.join(' AND ')})`;
+}
+
 const getFileType = async (userId, type) => {
 	try {
 
 		documentTypes = ['document', 'msword', 'pdf'];
+		imageTypes = ['image', 'png', 'jpg', 'jpeg', 'gif'];
+		videoTypes = ['video', 'mp4'];
+		musicTypes = ['audio', 'mp3', 'wav'];
+
 		await poolConnect;
 		const request = pool.request();
 		request.input('userId', sql.Int, userId)
 		let query = `SELECT * FROM Files WHERE userId = @userId `;
 
-		if (type === 'document') {
-			const conditions = documentTypes.map((ext, index) => {
-				const param = `fileType${index}`;
-				request.input(param, sql.NVarChar, `%${ext}`);
-				demo = `fileType LIKE @${param}`
-
-				return `fileType LIKE @${param}`;
-			});
-			query += `AND (${conditions.join(' OR ')})`;
+		if(type === 'document') {
+			query += getConditions(request, documentTypes);
+		} else if (type === 'image') {
+			query += getConditions(request, imageTypes);
+		} else if (type === 'video') {
+			query += getConditions(request, videoTypes);
+		}else if (type === 'music') {
+			query += getConditions(request, musicTypes);
+		}else if (type === 'orther') {
+			query += getNegativeConditions(request, [...documentTypes, ...imageTypes, ...videoTypes, ...musicTypes]);
 		}
-		else if (type !== 'null') {
-			query += ` AND fileType LIKE '%' + @fileType + '%'`;
-			request.input('fileType', sql.NVarChar, type);
-		}
+		
+		// else if (type !== 'null') {
+		// 	query += ` AND fileType LIKE '%' + @fileType + '%'`;
+		// 	request.input('fileType', sql.NVarChar, type);
+		// }
 		const result = await request.query(query);
 		return {
 			file: result.recordset
