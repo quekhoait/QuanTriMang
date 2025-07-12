@@ -213,7 +213,101 @@ const deleteUserFile = async (userId, listfileId) => {
 
 }
 
+// share file cho người khác
+// userId: id của được chia chia sẻ, fileId: id của file được chia sẻ
+const createFileShare = async (userId, fileId, permission, expiresDate = null, createDate) => {
+	try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('userId', sql.Int, userId);
+		request.input('fileId', sql.Int, fileId);
+		request.input('permission', sql.NVarChar, permission);
+		request.input('expiresDate', sql.DateTime, expiresDate);
+		request.input('createDate', sql.DateTime, createDate);
 
+		// Kiểm tra xem file đã được chia sẻ cho người dùng này chưa
+		const checkUserFile = await request.query(`
+			SELECT * FROM FileShare WHERE userId = @userId AND fileId = @fileId;	
+		`);
+
+		if (checkUserFile.recordset.length > 0) {
+			return {
+				message: 'File đã được chia sẻ cho người dùng này.',
+				fileShare: checkUserFile.recordset[0]
+			}
+		}
+
+		// Nếu chưa, thực hiện chia sẻ file
+		const result = await request.query(`
+			INSERT INTO FileShare (userId, fileId, permission, expiresDate)
+			VALUES (@userId, @fileId, @permission, @expiresDate);
+			SELECT * FROM FileShare WHERE id = SCOPE_IDENTITY();
+		`);
+		result.recordset[0].permission = result.recordset[0].permission.trim();
+
+		return {
+			message: 'Chia sẻ file thành công!',
+			fileShare: result.recordset[0]
+		};
+
+	} catch (error) {
+		console.error('Lỗi khi chia sẻ file:', error);
+		throw error;
+	}
+}
+
+// Lấy danh sách file đã được chia sẻ cho user
+const getFileShare = async (userId) => {
+	try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('userId', sql.Int, userId);
+
+		// f.* là thông tin file được chia sẻ của user là u.username,uemail
+		// fs.* thông tin file được chia sẻ cho user này userId
+		const result = await request.query(`
+			SELECT f.*, u.email, u.username, fs.permission,fs.expiresDate,fs.createDate as shareDate
+			FROM FileShare fs
+			JOIN Files f ON fs.fileId = f.id
+			JOIN Account u ON fs.userId = u.id
+			WHERE fs.userId = @userId;
+		`);
+
+		return {
+			message: 'Lấy danh sách file chia sẻ thành công',
+			fileShares: result.recordset
+		};
+	} catch (error) {
+		console.error('Lỗi khi lấy danh sách file chia sẻ:', error);
+		throw error;
+	}
+}
+
+//lấy danh sách file đã chia sẻ của user
+const getUserFileShare = async (userId) => {
+	try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('userId', sql.Int, userId);
+
+		
+		const result = await request.query(`
+			select f.*, fs.userId as sharedToUserId, c.username,c.email, fs.createDate,fs.expiresDate,fs.permission
+			from FileShare fs
+			join Files f on f.id = fs.fileId
+			join Account c on c.id = fs.userId
+			where f.userId = @userId
+		`);
+
+		return {
+			message: 'Lấy danh sách file đã chia sẻ của user thành công',
+			fileShares: result.recordset
+		};
+	} catch (error) {
+		console.error('Lỗi khi lấy danh sách file chia sẻ của user:', error);
+		throw error;
+	}
+}
 
 
 module.exports = {
@@ -221,5 +315,8 @@ module.exports = {
 	getUserFiles,
 	getUserFile,
 	deleteUserFile,
-	getFileType
+	getFileType,
+	createFileShare,
+	getFileShare,
+	getUserFileShare
 };

@@ -98,5 +98,30 @@ END
 
 
 
+-- Đổi kiểu dữ liệu trong bảng Account
+ALTER TABLE Account ALTER COLUMN avatar NVARCHAR(500);
+ALTER TABLE Account ALTER COLUMN role NVARCHAR(50);
+ALTER TABLE Account ALTER COLUMN email NVARCHAR(300);
+
+-- Đổi kiểu dữ liệu trong bảng FileShare
+ALTER TABLE FileShare ALTER COLUMN permission NVARCHAR(100);
 
 
+-----
+UPDATE Account
+SET 
+    email = TRIM(email),
+    username = TRIM(username),
+    role = TRIM(role),
+    avatar = TRIM(avatar)
+
+--------
+UPDATE FileShare
+SET 
+    permission = TRIM(permission);
+
+
+select f.*, fs.userId as sharedToUserId, c.username,c.email, fs.createDate,fs.expiresDate,fs.permission
+from FileShare fs
+	join Files f on f.id = fs.fileId
+	join Account c on c.id = fs.userId

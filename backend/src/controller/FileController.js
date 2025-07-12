@@ -137,7 +137,44 @@ const getFileType = async(req, res)=>{
   }
 }
 
+// {
+//   "userId": 2,
+//   "fileId": 8,
+//   "permission": "read",
+//   "expiresDate": "2025/08/17"
+// }
+const createFileShare = async (req, res) => {
+    const { userId, fileId, permission, expiresDate , createDate} = req.body;
+    try {
+        const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate, createDate = new Date());
+        res.json({ message: result.message, fileShare: result.fileShare });
+    } catch (error) {
+        console.error('Lỗi khi tạo chia sẻ file:', error);
+        res.status(500).json({ error: 'Lỗi khi tạo chia sẻ file.', info: error.message });
+    }
+}
 
+const getFileShare = async (req, res) => {
+    const userId = parseInt(req.params.userId);
+    try {
+        const result = await FileServices.getFileShare(userId);
+        res.json({ message: result.message, fileShares: result.fileShares });
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách file chia sẻ:', error);
+        res.status(500).json({ error: 'Lỗi khi lấy danh sách file chia sẻ.', info: error.message });
+    }
+}
+
+const getUserFileShare = async (req, res) => {
+    const userId = parseInt(req.params.userId);
+    try {
+        const result = await FileServices.getUserFileShare(userId);
+        res.json({ message: result.message, fileShares: result.fileShares });
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách file đã chia sẻ của user:', error);
+        res.status(500).json({ error: 'Lỗi khi lấy danh sách file đã chia sẻ của user.', info: error.message });
+    }
+}
 
 module.exports = {
     createFile,
@@ -145,5 +182,8 @@ module.exports = {
     getUserFile,
     deleteUserFile,
     getFileType,
+    createFileShare,
+    getFileShare,
+    getUserFileShare
 };
 
