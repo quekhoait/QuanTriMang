@@ -176,6 +176,23 @@ const getUserFileShare = async (req, res) => {
     }
 }
 
+// {
+//     "fileShareId":8,     
+//     "userId":3,        // ID của người dùng muốn thay đổi quyền
+//     "permission":"edit" // quyền mới
+// }
+
+const changePermissionFileShare = async (req, res) => {
+    const { fileShareId, userId, permission } = req.body;
+    try {
+        const result = await FileServices.changePermissionFileShare(fileShareId,userId, permission);
+        res.json({ message: result.message, fileShare: result.fileShare });
+    } catch (error) {
+        console.error('Lỗi khi thay đổi quyền chia sẻ file:', error);
+        res.status(500).json({ error: 'Lỗi khi thay đổi quyền chia sẻ file.', info: error.message });
+    }
+}
+
 module.exports = {
     createFile,
     getUserFiles,
@@ -184,6 +201,7 @@ module.exports = {
     getFileType,
     createFileShare,
     getFileShare,
-    getUserFileShare
+    getUserFileShare,
+    changePermissionFileShare
 };
 

@@ -309,7 +309,30 @@ const getUserFileShare = async (userId) => {
 	}
 }
 
+const changePermissionFileShare = async (fileShareId, userId, permission) => {
+	try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('fileShareId', sql.Int, fileShareId);
+		request.input('userId', sql.Int, userId);
+		request.input('permission', sql.NVarChar, permission);
 
+		const result = await request.query(`
+			UPDATE FileShare
+			SET permission = @permission
+			WHERE FileId = @fileShareId AND userId = @userId;
+			SELECT * FROM FileShare WHERE FileId = @fileShareId AND userId = @userId;
+		`);
+
+		return {
+			message: 'Cập nhật quyền chia sẻ thành công',
+			fileShare: result.recordset[0]
+		};
+	} catch (error) {
+		console.error('Lỗi khi cập nhật quyền chia sẻ:', error);
+		throw error;
+	}
+}
 module.exports = {
 	createFile,
 	getUserFiles,
@@ -318,5 +341,6 @@ module.exports = {
 	getFileType,
 	createFileShare,
 	getFileShare,
-	getUserFileShare
+	getUserFileShare,
+	changePermissionFileShare
 };

@@ -8,7 +8,8 @@ const {
     getFileType,
     createFileShare,
     getFileShare,
-    getUserFileShare
+    getUserFileShare,
+    changePermissionFileShare
 
 } = require('../controller/FileController');
 
@@ -26,6 +27,7 @@ router.get('/getFileType/:userId/:type', getFileType);
 router.post('/createFileShare', createFileShare);
 router.get('/receivedFileShare/:userId', getFileShare);
 router.get('/sharedFile/:userId', getUserFileShare);
+router.put('/changePermissionFileShare', changePermissionFileShare);
 
 
 
