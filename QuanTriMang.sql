@@ -7,7 +7,7 @@
     role CHAR(50) NULL,
     email CHAR(300) NULL,
     sizeUsed BIGINT NULL,
-    maxSizeUsed NCHAR(10) NOT NULL DEFAULT '1073741824'
+    maxSizeUsed BIGINT NOT NULL DEFAULT '1073741824'
 );
 
 CREATE TABLE Files (

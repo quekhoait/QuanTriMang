@@ -4,9 +4,26 @@ import { useUser } from "../../contexts/UserContext";
 
 const FileShareComponent = () => {
   //chứa dữ liệu đang chia sẻ của user hiện hành
-  const {listFileShare, getFileShare, getUserFile, userFile} = useFile();
+  // const {listFileShare, getFileShare, getUserFile, userFile} = useFile();
   const {account, getUser} = useUser();
 
+  const sharedFiles = [
+    {
+      email: "shareduser@example.com",
+      name: "Nguyễn Văn A",
+      fileName: "Đề tài khoa học dài vô tận và còn dài hơn nữa.docx",
+      sharedDate: "2024-07-11",
+    },
+  ];
+
+  const receivedFiles = [
+    {
+      email: "verylongemailaddress@exampledomain.com",
+      name: "Malcolm Lockyer",
+      fileName: "Tên file siêu dài và không thể đọc hết.docx",
+      receivedDate: "1961-01-01",
+    },
+  ];
 
 
 
@@ -33,7 +50,7 @@ const FileShareComponent = () => {
               </tr>
             </thead>
             <tbody>
-              {listFileShare.map((file, index) => (
+              {sharedFiles.map((file, index) => (
                 <tr key={index} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-3 py-3 max-w-[150px] truncate" title={file.email}>
                     {file.email}
@@ -81,7 +98,7 @@ const FileShareComponent = () => {
               </tr>
             </thead>
             <tbody>
-              {listFileShare.map((file, index) => (
+              {receivedFiles.map((file, index) => (
                 <tr key={index} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-3 py-3 max-w-[150px] truncate" title={file.email}>
                     {file.email}
