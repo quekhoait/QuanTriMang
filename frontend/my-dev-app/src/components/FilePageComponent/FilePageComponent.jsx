@@ -70,13 +70,16 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
 
   const [selectRow, setSelectRow] = useState([])
   const [listFileId, setListFileId] = useState([]);
-  const handleListSelect = (name, checked, ListFileId) => {
+  const [listFileSelect, setListFileSelect] = useState([]);
+  const handleListSelect = (name, checked, ListFileId, listFileSelect) => {
     if (checked) {
       setSelectRow(prev => [...prev, name]);
       setListFileId(prev => [...prev, ListFileId]);
+      setListFileSelect(prev => [...prev, listFileSelect])
     } else {
       setSelectRow(prev => prev.filter(item => item !== name)) //lọc qua các phần tử và giữ lại phần tử khác name
       setListFileId(prev => prev.filter(id => id !== listFileId));
+      setListFileSelect(prev =>prev.filter(keyPath => keyPath !== listFileSelect))
     }
   }
 
@@ -243,18 +246,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
   // Đường dẫn thư mục hiện hành
   const [pathFolder, setPathFolder] = useState([{ fileId: null, fileName: fileName }]);
 
-  // const caculatorDataUser = () => {
-  //   let count = 0;
-  //   listFile.forEach(e => {
-  //     if (e.userId === account?.data?.id) {
-  //       count += e.fileSize ? parseFloat(e.fileSize) : 0;
-  //     }
-  //   });
-  //   return +(count / (1024 * 1024 * 1024)).toFixed(2); // ✅ trả về number
-  // }
 
-
-  //   console.log(caculatorDataUser().typeof)
 
   //xoa file
 
@@ -287,6 +279,35 @@ const handleEdit = () => {
 const handleShareData = () => {
   setIsShowForm(true); // Bắt đầu bằng việc xác thực
 };
+
+//Hàm download
+//chứ xong còn phần dổi tên khi dowb xún
+const getDownloadUrl = (url) => {
+  return url.replace('/upload/', '/upload/fl_attachment/');
+};
+
+
+
+const handelDownload = () => {
+  const hasFolder = listFileSelect.some((file) => Number(file.isFolder) === 1);
+  console.log(hasFolder)
+  if (hasFolder) {
+    alert(" Không thể tải thư mục. Vui lòng bỏ chọn thư mục.");
+    return;
+  }
+   listFileSelect.forEach((file, index) => {
+    setTimeout(() => {
+      const link = document.createElement("a");
+      link.href = getDownloadUrl(file.keyPath);
+      link.setAttribute("download", file.fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }, index * 500); // mỗi lần cách nhau 500ms
+  });
+};
+
+
 
   return (
     <div className="p-6">
@@ -365,7 +386,7 @@ const handleShareData = () => {
               <FaShareAlt />
             </button>
 
-            <button className="">
+            <button className="" onClick={handelDownload} > 
               <FaDownload />
             </button>
           </div>}
@@ -412,7 +433,7 @@ const handleShareData = () => {
                   {/* Checkbox để chọn tập tin */}
                   <td className={`p-2 text-blue-700 w-8 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:!opacity-100'} transition-opacity duration-200`}>
                     <input type="checkbox" checked={isSelected}
-                      onChange={(e) => handleListSelect(file.fileName, e.target.checked, file.id)}
+                      onChange={(e) => handleListSelect(file.fileName, e.target.checked, file.id, file)}
 
                     />
                   </td>
@@ -431,6 +452,7 @@ const handleShareData = () => {
                     )}
                     {renamingFile === file.fileName ? (
                       <input
+                      
                         autoFocus
                         value={renameValue}
                         onChange={(e) => setRenameValue(e.target.value)}
@@ -441,7 +463,8 @@ const handleShareData = () => {
                         className="border px-2 py-1 rounded"
                       />
                     ) : (
-                      <span>{file.fileName}</span>
+                      <a href= {file.keyPath}  target="_blank">{file.fileName}</a>
+      
                     )}
                   </td>
                   {/* Hiển thị ngày tạo tập tin */}

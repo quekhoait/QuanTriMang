@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MenuItemComponent from '../MenuItemComponent/MenuItemComponent'
 import { FaAddressBook, FaEllipsisH, FaImages, FaMusic, FaPhotoVideo, FaRegFileAlt } from 'react-icons/fa'
 import HomePage from '../../pages/HomePage/HomePage'
@@ -7,7 +7,18 @@ import { useUser } from '../../contexts/UserContext'
 const NavMenuComponent = ({ openItem, onChangeItem }) => {
 
   const { account, getUser } = useUser();
+  const [dataUsed, setDataUsed] = useState(0)
 
+  const ToGB =(value)=>{
+    setDataUsed((value / (1024 * 1024)).toFixed(2));
+  }
+
+  useEffect((e)=>{
+    const dataUsed = parseInt(account?.data?.sizeUsed ||"0");
+    ToGB(dataUsed)
+  }, [account?.data?.sizeUsed])
+
+  console.log(dataUsed)
   return (
     <div>
       <div className="pb-[16px] border-b-[2px] border-blue-400">
@@ -59,7 +70,7 @@ const NavMenuComponent = ({ openItem, onChangeItem }) => {
           />
           {/* Progress bar */}
           <div className="w-full mt-auto justify-center">
-            <div className="text-gray-700 pb-[12px]">admin@gmail.com | 0,23 / 1gb</div>
+            <div className="text-gray-700 pb-[12px]">admin@gmail.com | {dataUsed} / 1024Mb</div>
             <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
               <div className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full w-[45%]"> 45%</div>
             </div>
