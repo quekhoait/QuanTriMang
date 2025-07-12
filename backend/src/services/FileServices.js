@@ -213,72 +213,7 @@ const deleteUserFile = async (userId, listfileId) => {
 
 }
 
-const shareFile = async(userId, fileId, userIdRece)=>{
-  const createDate = new Date();
-  try{
-    await poolConnect;
-    const request =pool.request();
-    request.input('userId', sql.Int, userId)
-    request.input('fileId', sql.Int, fileId)
-    request.input('userIdReceive', sql.Int, userIdRece)
-	  request.input('createDate', sql.DateTime, createDate);
-    		const result = await request.query(`
-            INSERT INTO FileShare (userId, fileId, userIdReceive, createDate)
-            VALUES (@userId, @fileId, @userIdReceive, @createDate);
-            SELECT * FROM FileShare WHERE id = SCOPE_IDENTITY();
-        `);
-  return {
-			file: result.recordset[0]
-		};
-  }catch(err){
-    console.error('Lỗi khi lấy danh sách file trong DB:', err);
-		return {
-			message: "Lỗi truy vấn cơ sở dữ liệu khi xóa file: " + err
-		}
-  }
-}
 
-
-//lấy file đang share
-const getFileShare = async(userId)=>{
-try {
-		await poolConnect;
-		const request = pool.request();
-		request.input('userId', sql.Int, userId);
-		const result = await request.query(`
-            select * from FileShare where userId = @userId 
-            `)
-
-		return {
-			file: result.recordset
-		}
-
-	} catch (error) {
-		console.error('Lỗi khi lấy danh sách file trong DB:', error);
-		throw error;
-	}
-}
-
-
-//lấy file nhận dc
-const getFileReceive = async(userIdRece)=>{
-try {
-		await poolConnect;
-		const request = pool.request();
-		request.input('userIdReceive', sql.Int, userIdRece);
-		const result = await request.query(`
-            select * from FileShare where userIdReceive = @userIdReceive 
-            `)
-
-		return {
-			file: result.recordset
-		}
-
-	} catch (error) {
-		console.error('Lỗi khi lấy danh sách file trong DB:', error);
-		throw error;
-	}
-}
 
 module.exports = {
 	createFile,
@@ -286,7 +221,5 @@ module.exports = {
 	getUserFile,
 	deleteUserFile,
 	getFileType,
-  shareFile,
-  getFileShare,
-  getFileReceive
+
 };
