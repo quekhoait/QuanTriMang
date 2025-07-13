@@ -123,18 +123,18 @@ const getFileType = async (userId, type) => {
 		request.input('userId', sql.Int, userId)
 		let query = `SELECT * FROM Files WHERE userId = @userId `;
 
-		if(type === 'document') {
+		if (type === 'document') {
 			query += getConditions(request, documentTypes);
 		} else if (type === 'image') {
 			query += getConditions(request, imageTypes);
 		} else if (type === 'video') {
 			query += getConditions(request, videoTypes);
-		}else if (type === 'music') {
+		} else if (type === 'music') {
 			query += getConditions(request, musicTypes);
-		}else if (type === 'orther') {
+		} else if (type === 'orther') {
 			query += getNegativeConditions(request, [...documentTypes, ...imageTypes, ...videoTypes, ...musicTypes]);
 		}
-		
+
 		// else if (type !== 'null') {
 		// 	query += ` AND fileType LIKE '%' + @fileType + '%'`;
 		// 	request.input('fileType', sql.NVarChar, type);
@@ -265,8 +265,8 @@ const createFileShare = async (userId, fileId, permission, expiresDate = null, c
 
 		// Nếu chưa, thực hiện chia sẻ file
 		const result = await request.query(`
-			INSERT INTO FileShare (userId, fileId, permission, expiresDate)
-			VALUES (@userId, @fileId, @permission, @expiresDate);
+			INSERT INTO FileShare (userId, fileId, permission, expiresDate, createDate)
+			VALUES (@userId, @fileId, @permission, @expiresDate, @createDate);
 			SELECT * FROM FileShare WHERE id = SCOPE_IDENTITY();
 		`);
 		result.recordset[0].permission = result.recordset[0].permission.trim();
@@ -316,7 +316,7 @@ const getUserFileShare = async (userId) => {
 		const request = pool.request();
 		request.input('userId', sql.Int, userId);
 
-		
+
 		const result = await request.query(`
 			select f.*, fs.userId as sharedToUserId, c.username,c.email, fs.createDate,fs.expiresDate,fs.permission
 			from FileShare fs
