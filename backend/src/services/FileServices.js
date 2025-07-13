@@ -241,7 +241,7 @@ const deleteUserFile = async (userId, listfileId) => {
 
 // share file cho người khác
 // userId: id của được chia chia sẻ, fileId: id của file được chia sẻ
-const createFileShare = async (userId, fileId, permission, expiresDate = null, createDate) => {
+const createFileShare = async (userId, fileId, permission, expiresDate = null) => {
 	try {
 		await poolConnect;
 		const request = pool.request();
@@ -249,7 +249,7 @@ const createFileShare = async (userId, fileId, permission, expiresDate = null, c
 		request.input('fileId', sql.Int, fileId);
 		request.input('permission', sql.NVarChar, permission);
 		request.input('expiresDate', sql.DateTime, expiresDate);
-		request.input('createDate', sql.DateTime, createDate);
+		request.input('createDate', sql.DateTime, new Date());
 
 		// Kiểm tra xem file đã được chia sẻ cho người dùng này chưa
 		const checkUserFile = await request.query(`
@@ -265,12 +265,11 @@ const createFileShare = async (userId, fileId, permission, expiresDate = null, c
 
 		// Nếu chưa, thực hiện chia sẻ file
 		const result = await request.query(`
-			INSERT INTO FileShare (userId, fileId, permission, expiresDate)
-			VALUES (@userId, @fileId, @permission, @expiresDate);
+			INSERT INTO FileShare (userId, fileId, permission, expiresDate, createDate)
+			VALUES (@userId, @fileId, @permission, @expiresDate, @createDate);
 			SELECT * FROM FileShare WHERE id = SCOPE_IDENTITY();
 		`);
 		result.recordset[0].permission = result.recordset[0].permission.trim();
-
 		return {
 			message: 'Chia sẻ file thành công!',
 			fileShare: result.recordset[0]
