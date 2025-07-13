@@ -34,7 +34,7 @@ const FormAuthenComponent = ({onSuccess, onClose, mess, notification}) => {
 
   return (
   <div className= {`fixed inset-0 bg-black/50 z-[100] flex items-center justify-center `}>
-  <div className="bg-white rounded-2xl w-[360px] p-6 relative shadow-lg">
+      <div className="bg-white rounded-2xl w-[360px] p-6 relative shadow-lg">
     <h1 className="text-[2rem] font-semibold text-center mb-4">{notification}</h1>
     <div className="mb-5">
       <label htmlFor="inputPassword" className="block font-medium text-gray-700 mb-1 text-[1.2em] text-left pb-2">

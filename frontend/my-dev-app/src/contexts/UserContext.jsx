@@ -9,6 +9,7 @@ const UserContext = createContext({
 export const UserProvider = ({children})=>{
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || '');
     const [account, setAccount] = useState(null);
+  //  const [userByEmail, setUserByEmail] = useState();
 
     const getUser = async(token)=>{
         try{
@@ -54,10 +55,28 @@ useEffect(() => {
   }
 }, [accessToken]);
 
+  const getUserByEmail = async(email)=>{
+        try{
+        const response = await fetch(`http://localhost:5999/api/user/getUserEmail/${email}`,{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        if(response.ok){
+            const dataUser = await response.json();
+            return dataUser.data;
+        }else{
+          alert("Lỗi API")
+        }
+        }catch (e) {
+            console.error('Lỗi:', e.message);
+        }
+    }
 
 
   return (
-    <UserContext.Provider value={{ account, accessToken, setAccessToken, getUser }}>
+    <UserContext.Provider value={{ account, accessToken, setAccessToken, getUser, getUserByEmail }}>
       {children}
     </UserContext.Provider>
   );
