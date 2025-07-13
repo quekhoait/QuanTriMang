@@ -144,9 +144,9 @@ const getFileType = async(req, res)=>{
 //   "expiresDate": "2025/08/17"
 // }
 const createFileShare = async (req, res) => {
-    const { userId, fileId, permission, expiresDate , createDate} = req.body;
+    const { userId, fileId, permission, expiresDate} = req.body;
     try {
-        const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate, createDate = new Date());
+        const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate );
         res.json({ message: result.message, fileShare: result.fileShare });
     } catch (error) {
         console.error('Lỗi khi tạo chia sẻ file:', error);

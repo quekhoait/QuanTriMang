@@ -15,7 +15,7 @@ const createUser = (newUser) => {
           status: "ERR",
           message: "Email đã tồn tại",
         });
-      }
+      } 
 
       const checkUsername = await pool
         .request()
@@ -102,6 +102,29 @@ const getUser = (id)=>{
   })
 }
 
+const getUserEmail = (email)=>{
+  return new Promise(async(resolve, reject)=>{
+    try{
+      await pool.connect();
+      const user = await pool.request().input('email', email).query("Select * from Account Where email = @email");
+      if(user.recordset.length===0){
+        return resolve({
+          status: "ERR",
+          message: "Không tìm thấy"
+        })
+      } 
+      resolve({
+          status: "ok",
+          message: "Đã tìm thấy",
+          data: user.recordset[0]
+        })
+
+    }catch(err){
+      reject(err);
+    }
+  })
+}
+
 const updateUser = (id, data)=>{
     return new Promise(async(resolve, reject)=>{
         try{
@@ -149,5 +172,6 @@ module.exports = {
   createUser,
   loginUser,
   getUser,
+  getUserEmail,
   updateUser
 };

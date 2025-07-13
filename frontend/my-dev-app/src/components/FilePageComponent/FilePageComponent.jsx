@@ -6,6 +6,8 @@ import { FaRegStar } from "react-icons/fa6";
 import { useUser } from "../../contexts/UserContext";
 import { useFile } from "../../contexts/FileContext";
 import FormAuthenComponent from "../FormAuthenComponent/FormAuthenComponent";
+import { FormShareComponent } from "../FormShareComponent/FormShareComponent";
+import FileShareComponent from "../FileShareComponent/FileShareComponent";
 
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
   //listFiles json dữ liệu tệp tin lấy api/file/listFile/:userId/:parentFolderId
@@ -311,6 +313,7 @@ const handelDownload = () => {
 
   return (
     <div className="p-6">
+
       {/* Header */}
       {isShowForm && (
                   <FormAuthenComponent 
@@ -322,15 +325,9 @@ const handelDownload = () => {
                   )
                 }
     {isShowFormInfo && (
-      <FormAuthenComponent
-        onSuccess={() => {
-          setIsShowFormInfo(false);
-          console.log("Chia sẻ thành công!");
-        }}
-        onClose={handleShowFormInfo}
-        notification={"Nhập email người muốn chia sẻ"}
-        mess={"Email"}
-      />
+          <FormShareComponent
+      listFileId = {listFileId}
+     />
     )}
       
       <div className="flex items-center justify-between mb-3">

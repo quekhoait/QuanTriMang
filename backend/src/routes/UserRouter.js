@@ -8,8 +8,9 @@ const {uploadAvatar} = require("../authMiddleware/uploadMiddleware")
 router.post("/create", userController.createUser);
 router.post ("/login", userController.loginUser);
 router.get ("/get-user",authMiddleware, userController.getUser);
+router.get ("/getUserEmail/:email", userController.getUserEmail);
 router.post('/refreshToken', userController.refreshToken);
 router.put('/update/:id', uploadAvatar.single('avatar'), userController.updateUser);
 router.post('/logout', userController.logoutUser);
 
-module.exports = router;
+module.exports = router; 

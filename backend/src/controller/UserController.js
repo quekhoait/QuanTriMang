@@ -17,7 +17,7 @@ const createUser = async(req, res)=>{
      if(password.length < 6){
       return res.status(400).json({
         status: "ERR",
-        message: "Mật khẩu phải dài hơn 6 ký tự"
+        message: "Mật khẩu phải dài hơn 6 ký tự" 
       })
     }
     if(!isCheckEmail){
@@ -82,6 +82,19 @@ const getUser  =async(req, res)=>{
   }
 }
 
+const getUserEmail  =async(req, res)=>{
+  try{
+    const email = req.params.email;
+    const user = await UserServices.getUserEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+    return res.status(200).json(user);
+  }catch(err){
+    return res.status(404).json({message: err.message})
+  }
+}
+
 const refreshToken = async(req, res)=>{
   try{
     const refreshToken = req.cookies.refreshToken;
@@ -137,6 +150,7 @@ module.exports = {
     createUser,
     loginUser,
     getUser,
+    getUserEmail,
     refreshToken,
     updateUser,
     logoutUser
