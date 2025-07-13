@@ -294,7 +294,7 @@ const getFileShare = async (userId) => {
 			SELECT f.*, u.email, u.username, fs.permission,fs.expiresDate,fs.createDate as shareDate
 			FROM FileShare fs
 			JOIN Files f ON fs.fileId = f.id
-			JOIN Account u ON fs.userId = u.id
+			JOIN Account u ON f.userId = u.id
 			WHERE fs.userId = @userId;
 		`);
 
@@ -314,7 +314,6 @@ const getUserFileShare = async (userId) => {
 		await poolConnect;
 		const request = pool.request();
 		request.input('userId', sql.Int, userId);
-
 		
 		const result = await request.query(`
 			select f.*, fs.userId as sharedToUserId, c.username,c.email, fs.createDate,fs.expiresDate,fs.permission
@@ -348,10 +347,10 @@ const changePermissionFileShare = async (fileShareId, userId, permission) => {
 			WHERE FileId = @fileShareId AND userId = @userId;
 			SELECT * FROM FileShare WHERE FileId = @fileShareId AND userId = @userId;
 		`);
-
+      console.log(result)
 		return {
 			message: 'Cập nhật quyền chia sẻ thành công',
-			fileShare: result.recordset[0]
+			fileShares: result.recordset
 		};
 	} catch (error) {
 		console.error('Lỗi khi cập nhật quyền chia sẻ:', error);

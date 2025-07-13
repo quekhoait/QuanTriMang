@@ -111,7 +111,7 @@ const getUserEmail = (email)=>{
         return resolve({
           status: "ERR",
           message: "Không tìm thấy"
-        })
+        })                                        
       } 
       resolve({
           status: "ok",
