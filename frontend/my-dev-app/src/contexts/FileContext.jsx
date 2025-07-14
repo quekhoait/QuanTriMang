@@ -57,7 +57,6 @@ export const FileProvider = ({ children }) => {
           credentials: 'include'
         })
         const data = await response.json();
-        console.log(data)
         if(response.ok){
           setListFileType(data.file)
         }else{
@@ -82,7 +81,6 @@ export const FileProvider = ({ children }) => {
             });
 
             const data = await response.json();
-            console.log(data)
             if (response.ok) {
                 alert("🗑️ Xóa thành công các file/thư mục đã chọn!");
                 getListFileParent(rowId);
@@ -119,6 +117,70 @@ export const FileProvider = ({ children }) => {
       }
     }
     
+//Lấy thông tin file mà user hiện hành đã nhận được
+
+    const getReceiveFile = async(id)=>{
+      try{
+        const response = await fetch(`http://localhost:5999/api/file/receivedFileShare/${id}`,{
+          method: "GET",
+          credentials: 'include'
+        })
+        const data = await response.json();
+
+
+        if(response.ok){
+          return data.fileShares;
+        }else{
+          alert("Lỗi khi lấy danh sách: " + data.message)
+        }
+      }catch(err){
+        alert("Lỗi server" + err.message)
+      }
+    }
+
+        const getShareFile = async(id)=>{
+      try{
+        const response = await fetch(`http://localhost:5999/api/file/sharedFile/${id}`,{
+          method: "GET",
+          credentials: 'include'
+        })
+        const data = await response.json();
+        if(response.ok){
+          return data.fileShares;
+        }else{
+          alert("Lỗi khi lấy danh sách: " + data.message)
+        }
+      }catch(err){
+        alert("Lỗi server" + err.message)
+      }
+    }
+
+      const changePermissionFileShare = async (fileShareId, userId, permission) => {
+        try {
+            const response = await fetch("http://localhost:5999/api/file/changePermissionFileShare", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  fileShareId: fileShareId,
+                    userId: userId,
+                    permission: permission, 
+                }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                return data.fileShares;
+            } else {
+                alert("Lỗi API");
+            }
+        } catch (err) {
+          alert("Lỗi API");
+        }
+    };
+
+
 
 
     // useEffect(() => {
@@ -132,7 +194,7 @@ export const FileProvider = ({ children }) => {
 
     return (
         <UserContext.Provider value={{ listFileParent, getListFileParent, rowId, setRowId,
-         removeFile, listFileType, getFileType, listFileItemShare, createFileShare}}>
+         removeFile, listFileType, getFileType, listFileItemShare, createFileShare, getReceiveFile, getShareFile, changePermissionFileShare}}>
             {children}
         </UserContext.Provider>
     );

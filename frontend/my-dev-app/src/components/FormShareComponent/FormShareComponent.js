@@ -9,7 +9,7 @@ export const FormShareComponent = ({listFileId}) => {
   const [expireDate, setExpireDate] = useState(null);
   const [permission, setPermission] = useState("read");
   const { getUserByEmail, account} = useUser();
-  const {listFileItemShare, createFileShare, getUserFile, userFile} = useFile();
+  const {createFileShare, getUserFile, userFile} = useFile();
 
 
   const handleSubmit = async(e) => {
@@ -17,7 +17,6 @@ export const FormShareComponent = ({listFileId}) => {
   try {
     // Lấy thông tin người dùng từ email
     const user = await getUserByEmail(email); // nên trả về từ hàm
-    console.log(user)
     if (!user || !user.id) {
       alert("Không tìm thấy người dùng");
       return;
@@ -26,18 +25,19 @@ export const FormShareComponent = ({listFileId}) => {
       alert("Không Hợp lệ");
       return;
     }
-    // ✅ Định dạng ngày hết hạn
+    // // ✅ Định dạng ngày hết hạn
     const formattedExpireDate = expireDate
       ? `${expireDate.getFullYear()}/${String(expireDate.getMonth() + 1).padStart(2, '0')}/${String(expireDate.getDate()).padStart(2, '0')}`
       : null;
 
-    console.log("Ngày hết hạn:", formattedExpireDate);
+  
     // Gửi từng fileId
     for (const fileId of listFileId) {
       await createFileShare(user.id, fileId, permission, formattedExpireDate);
     }
 
     alert("✅ Chia sẻ thành công!");
+    window.location.reload();
   } catch (error) {
     console.error("❌ Lỗi chia sẻ:", error);
     alert("❌ Chia sẻ thất bại: " + error.message);

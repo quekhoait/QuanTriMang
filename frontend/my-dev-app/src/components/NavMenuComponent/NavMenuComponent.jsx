@@ -17,8 +17,6 @@ const NavMenuComponent = ({ openItem, onChangeItem }) => {
     const dataUsed = parseInt(account?.data?.sizeUsed ||"0");
     ToGB(dataUsed)
   }, [account?.data?.sizeUsed])
-
-  console.log(dataUsed)
   return (
     <div>
       <div className="pb-[16px] border-b-[2px] border-blue-400">

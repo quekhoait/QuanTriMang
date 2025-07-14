@@ -292,7 +292,6 @@ const getDownloadUrl = (url) => {
 
 const handelDownload = () => {
   const hasFolder = listFileSelect.some((file) => Number(file.isFolder) === 1);
-  console.log(hasFolder)
   if (hasFolder) {
     alert(" Không thể tải thư mục. Vui lòng bỏ chọn thư mục.");
     return;
