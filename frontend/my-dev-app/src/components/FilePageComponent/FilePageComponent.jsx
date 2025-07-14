@@ -8,6 +8,7 @@ import { useFile } from "../../contexts/FileContext";
 import FormAuthenComponent from "../FormAuthenComponent/FormAuthenComponent";
 import { FormShareComponent } from "../FormShareComponent/FormShareComponent";
 import FileShareComponent from "../FileShareComponent/FileShareComponent";
+import { fetchWithAuth } from "../../utils/authFetch";
 
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
   //listFiles json dữ liệu tệp tin lấy api/file/listFile/:userId/:parentFolderId
@@ -139,7 +140,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
   const createFolder = async () => {  
     console.log(token)
     try {
-      const response = await fetch('http://localhost:5999/api/file/upload', {
+      const response = await fetchWithAuth('http://localhost:5999/api/file/upload', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -236,7 +237,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     formData.append("isFolder", 0);
     formData.append("parentFolderId", rowId);
     try {
-      const response = await fetch('http://localhost:5999/api/file/upload', {
+      const response = await fetchWithAuth('http://localhost:5999/api/file/upload', {
         method: "POST",
          headers: {
         'Authorization': 'Bearer ' + token
@@ -322,6 +323,10 @@ const handelDownload = () => {
 };
 
 
+const handleLoad = ()=>{
+  window.location.reload();
+}
+
 
   return (
     <div className="p-6">
@@ -355,8 +360,7 @@ const handelDownload = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <FaRedoAlt className="cursor-pointer" />
-          <FaTh className="cursor-pointer" />
+          <FaRedoAlt className="cursor-pointer" onClick={handleLoad}/>
         </div>
       </div>
 

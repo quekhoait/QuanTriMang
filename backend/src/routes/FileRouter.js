@@ -35,7 +35,7 @@ router.get('/getFileType/:userId/:type',authMiddleware,  getFileType);
 router.post('/createFileShare',authMiddleware, createFileShare);
 router.get('/receivedFileShare/:userId',authMiddleware,  getFileShare);
 router.get('/sharedFile/:userId',authMiddleware,  getUserFileShare);
-router.put('/changePermissionFileShare',authMiddleware, changePermissionFileShare);
+router.put('/changePermissionFileShare', changePermissionFileShare);
 
 
 

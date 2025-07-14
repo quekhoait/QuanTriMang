@@ -233,12 +233,10 @@ const getUserFileShare = async (req, res) => {
 
 const changePermissionFileShare = async (req, res) => {
     const { fileShareId, userId, permission } = req.body;
-    if (req.user.id !== userId) {
-        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
-    }
     try {
         const result = await FileServices.changePermissionFileShare(fileShareId,userId, permission);
-        res.json({ message: result.message, fileShare: result.fileShare });
+        console.log(result)
+        res.json({ message: result.message, fileShare: result.fileShares });
     } catch (error) {
         console.error('Lỗi khi thay đổi quyền chia sẻ file:', error);
         res.status(500).json({ error: 'Lỗi khi thay đổi quyền chia sẻ file.', info: error.message });
