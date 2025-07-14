@@ -245,6 +245,9 @@ const createFileShare = async (userId, fileId, permission, expiresDate = null) =
 	try {
 		await poolConnect;
 		const request = pool.request();
+
+		console.log('==============Chia sẻ file:', { userId, fileId, permission, expiresDate });
+
 		request.input('userId', sql.Int, userId);
 		request.input('fileId', sql.Int, fileId);
 		request.input('permission', sql.NVarChar, permission);

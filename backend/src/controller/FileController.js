@@ -145,6 +145,7 @@ const getFileType = async(req, res)=>{
 // }
 const createFileShare = async (req, res) => {
     const { userId, fileId, permission, expiresDate} = req.body;
+    console.log('Tạo chia sẻ file:', { userId, fileId, permission, expiresDate });
     try {
         const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate );
         res.json({ message: result.message, fileShare: result.fileShare });

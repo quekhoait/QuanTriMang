@@ -96,7 +96,7 @@ export const FileProvider = ({ children }) => {
     };
 
 
-    const createFileShare = async(userId, fileId, permission, expireDate)=>{
+    const createFileShare = async(userId, fileId, permission, expiresDate)=>{
       try{
         const response = await fetch("http://localhost:5999/api/file/createFileShare",{
           method: "POST",
@@ -104,7 +104,7 @@ export const FileProvider = ({ children }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId, fileId, permission, expireDate
+            userId, fileId, permission, expiresDate
           })
         })
         const data = await response.json();
