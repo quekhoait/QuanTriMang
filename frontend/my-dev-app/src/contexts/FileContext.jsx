@@ -8,6 +8,8 @@ const UserContext = createContext({
     rowId: null
 })
 
+const token = localStorage.getItem("accessToken");
+
 export const FileProvider = ({ children }) => {
     const [listFileParent, setListFileParent] = useState([]);
     const [listFileType, setListFileType] = useState([]);
@@ -23,6 +25,9 @@ export const FileProvider = ({ children }) => {
         try {
             const response = await fetch(`http://localhost:5999/api/file/listFile/${userId}/${parentFolderId === null ? 'NULL' : rowId}`, {
                 method: "GET",
+                headers: {
+                  'Authorization': 'Bearer ' + token,
+                },
                 credentials: 'include'
             })
             const data = await response.json();
@@ -54,6 +59,9 @@ export const FileProvider = ({ children }) => {
       try{
         const response = await fetch(`http://localhost:5999/api/file/getFileType/${userId}/${type}`,{
           method: "GET",
+          headers: {
+                  'Authorization': 'Bearer ' + token,
+                },
           credentials: 'include'
         })
         const data = await response.json();
@@ -72,6 +80,7 @@ export const FileProvider = ({ children }) => {
             const response = await fetch("http://localhost:5999/api/file/deleteFile", {
                 method: "DELETE",
                 headers: {
+                  'Authorization': 'Bearer ' + token,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -98,8 +107,9 @@ export const FileProvider = ({ children }) => {
       try{
         const response = await fetch("http://localhost:5999/api/file/createFileShare",{
           method: "POST",
-          headers:{
-            "Content-Type": "application/json",
+          headers:{"Content-Type": "application/json",
+            'Authorization': 'Bearer ' + token,
+            
           },
           body: JSON.stringify({
             userId, fileId, permission, expiresDate
@@ -123,7 +133,10 @@ export const FileProvider = ({ children }) => {
       try{
         const response = await fetch(`http://localhost:5999/api/file/receivedFileShare/${id}`,{
           method: "GET",
-          credentials: 'include'
+          credentials: 'include',
+            headers: {
+                  'Authorization': 'Bearer ' + token,
+                },
         })
         const data = await response.json();
 
@@ -142,7 +155,10 @@ export const FileProvider = ({ children }) => {
       try{
         const response = await fetch(`http://localhost:5999/api/file/sharedFile/${id}`,{
           method: "GET",
-          credentials: 'include'
+          credentials: 'include',
+            headers: {
+                  'Authorization': 'Bearer ' + token,
+                },
         })
         const data = await response.json();
         if(response.ok){
@@ -161,6 +177,7 @@ export const FileProvider = ({ children }) => {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': 'Bearer ' + token,
                 },
                 body: JSON.stringify({
                   fileShareId: fileShareId,
