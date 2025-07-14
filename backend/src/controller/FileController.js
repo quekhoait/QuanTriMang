@@ -4,8 +4,15 @@ const {cloudinary} = require('../../cloudinary.js');
 const dotenv = require('dotenv');
 dotenv.config();
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const dangerousExtensions = [
+  '.exe', '.bat', '.cmd', '.vbs', '.js', '.msi', '.scr', '.jar', '.ps1', '.lnk', 
+  '.docm', '.xlsm', '.pptm','.sql'
+]; // mở rộng tùy dự án
+
 // tạo file và folder lưu dưới db và cloudinary
 const createFile = async (req, res) => {
+
     const fileName = (req.file?.originalname || req.body.fileName)?.trim();
     const fileSize = req.file?.size || 0;
     const fileType = req.file?.mimetype.trim() || null;
@@ -13,8 +20,11 @@ const createFile = async (req, res) => {
     const parentFolderId = parseInt(req.body.parentFolderId) || null;
     const isFolder = parseInt(req.body.isFolder) || 0;
     const updateDate = null;
-
-
+  console.log(req.file)
+    //Kiểm tra quyenf hợp lệ khi đăng nhập và up
+     if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền upload file cho user này.' });
+    }
     try {
         if (isFolder === 1) {
             // 👈 Trường hợp tạo FOLDER, không upload Cloudinary
@@ -32,6 +42,21 @@ const createFile = async (req, res) => {
                 updateDate: null,
             });
             return res.json({ message: 'Tạo thư mục thành công!', file: newFolder });
+        }
+           
+          if (!req.file) {
+            return res.status(400).json({ error: 'Không có file nào được upload.' });
+        }
+
+        // console.log(fileType)
+      //  Kiểm tra định dạng MIME hợp lệ
+        if (dangerousExtensions.includes(fileType)) {
+            return res.status(415).json({ error: 'Định dạng tệp không được phép.' });
+        }
+
+        //  Giới hạn dung lượng file
+        if (fileSize > MAX_FILE_SIZE) {
+            return res.status(413).json({ error: 'Tệp quá lớn. Giới hạn là 10MB.' });
         }
 
         const path = require("path");

@@ -132,16 +132,18 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     }
   };
 
-
   //Tạo folder mới
   const { account, getUser } = useUser();
-
-  const createFolder = async () => {
+  //Laayus token
+  const token = localStorage.getItem('accessToken');
+  const createFolder = async () => {  
+    console.log(token)
     try {
       const response = await fetch('http://localhost:5999/api/file/upload', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer '+ token
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -214,9 +216,17 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
   const uploadFilde = async (fileUpload) => {
     const isDuplicate = listFiles.find(file => file.fileName === fileUpload.name);
     if (isDuplicate) {
-      alert("⚠️ Tên file đã tồn tại!");
+      alert(" Tên file đã tồn tại!");
       return; // 👉 Dừng luôn hàm nếu trùng
     }
+     if (fileUpload.size > 10 * 1024 * 1024) {
+    alert(" Kích thước file vượt quá 10MB!");
+    return;
+  }
+  if (!token) {
+    alert(" Token không tồn tại. Vui lòng đăng nhập lại!");
+    return;
+  }
     const formData = new FormData();
     formData.append("file", fileUpload);
     formData.append("userId", account?.data?.id);
@@ -228,7 +238,10 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     try {
       const response = await fetch('http://localhost:5999/api/file/upload', {
         method: "POST",
-        credentials: 'include',
+         headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      credentials: 'include',
         body: formData
       })
       const data = await response.json();

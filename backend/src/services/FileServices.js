@@ -31,6 +31,12 @@ const createFile = async ({
 		request.input('publicId', sql.NVarChar, publicId);
 		request.input('createDate', sql.DateTime, createDate);
 		request.input('updateDate', sql.DateTime, updateDate);
+    if(fileSize > 1024 * 10 *1024){
+      return {
+      success: false, 
+      message: "Kích thước file quá nhỏ (tối thiểu 10KB)"
+  };
+    }
 
 		const result = await request.query(`
             INSERT INTO Files (userId, parentFolderId, fileName, fileSize, fileType, isFolder, keyPath, publicId, createDate, updateDate)
@@ -314,12 +320,6 @@ const getUserFileShare = async (userId) => {
 		await poolConnect;
 		const request = pool.request();
 		request.input('userId', sql.Int, userId);
-<<<<<<< HEAD
-		
-=======
-
-
->>>>>>> e0aafe378a5f84db4bc8e8a0a44e6a5f64138779
 		const result = await request.query(`
 			select f.*, fs.userId as sharedToUserId, c.username,c.email, fs.createDate,fs.expiresDate,fs.permission
 			from FileShare fs
