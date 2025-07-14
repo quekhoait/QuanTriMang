@@ -12,19 +12,26 @@ const {
     changePermissionFileShare
 
 } = require('../controller/FileController');
+
 const { authMiddleware } = require("../authMiddleware/authMiddleware");
+
+
+
 
 
 const upload = multer();
 
 
 //  api/file
+
 router.post('/upload', authMiddleware, upload.single('file'), createFile);
+
+
 router.get('/listFile/:userId/:parentFolderId', getUserFiles);
 router.get('/oneFile/:userId/:fileId',getUserFile);
 router.delete('/deleteFile',deleteUserFile);
 router.get('/getFileType/:userId/:type', getFileType);
-router.post('/createFileShare', createFileShare);
+router.post('/createFileShare',authMiddleware, createFileShare);
 router.get('/receivedFileShare/:userId', getFileShare);
 router.get('/sharedFile/:userId', getUserFileShare);
 router.put('/changePermissionFileShare', changePermissionFileShare);
