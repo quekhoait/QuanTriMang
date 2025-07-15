@@ -1,28 +1,31 @@
 const FileServices = require('../services/FileServices.js');
 const streamifier = require('streamifier')
-const {cloudinary} = require('../../cloudinary.js');
+const { cloudinary } = require('../../cloudinary.js');
 const dotenv = require('dotenv');
 dotenv.config();
 
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    const dangerousExtensions = [
-  '.exe', '.bat', '.cmd', '.vbs', '.js', '.msi', '.scr', '.jar', '.ps1', '.lnk', 
-  '.docm', '.xlsm', '.pptm','.sql'
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const dangerousExtensions = [
+    '.exe', '.bat', '.cmd', '.vbs', '.js', '.msi', '.scr', '.jar', '.ps1', '.lnk',
+    '.docm', '.xlsm', '.pptm', '.sql'
 ]; // mở rộng tùy dự án
 
 // tạo file và folder lưu dưới db và cloudinary
 const createFile = async (req, res) => {
 
+   
+    
+
     const fileName = (req.file?.originalname || req.body.fileName)?.trim();
     const fileSize = req.file?.size || 0;
     const fileType = req.file?.mimetype.trim() || null;
-    const userId = req.body.userId;
+    const userId = parseInt(req.body.userId)
     const parentFolderId = parseInt(req.body.parentFolderId) || null;
     const isFolder = parseInt(req.body.isFolder) || 0;
     const updateDate = null;
-  console.log(req.file)
-    //Kiểm tra quyenf hợp lệ khi đăng nhập và up
-     if (req.user.id !== userId) {
+ 
+
+    if (req.user.id !== userId) {
         return res.status(403).json({ error: 'Bạn không có quyền upload file cho user này.' });
     }
     try {
@@ -43,14 +46,12 @@ const createFile = async (req, res) => {
             });
             return res.json({ message: 'Tạo thư mục thành công!', file: newFolder });
         }
-           
-          if (!req.file) {
+
+        if (!req.file) {
             return res.status(400).json({ error: 'Không có file nào được upload.' });
         }
 
-        // console.log(fileType)
-      //  Kiểm tra định dạng MIME hợp lệ
-        if (dangerousExtensions.includes(fileType)) {
+        if (dangerousExtensions.includes(fileName)) {
             return res.status(415).json({ error: 'Định dạng tệp không được phép.' });
         }
 
@@ -100,7 +101,7 @@ const createFile = async (req, res) => {
             createDate: new Date(),
             updateDate,
         });
-    
+
         res.json({ message: 'Tải lên thành công!', file: newFile });
     } catch (error) {
         res.status(500).json({ error: 'Lỗi tải lên tệp tin/thư mục.', info: error.message });
@@ -122,44 +123,46 @@ const getUserFiles = async (req, res) => {
 };
 
 //lấy chính xác 1 file nào đó
-const getUserFile = async (req,res) => {
+const getUserFile = async (req, res) => {
     const userId = parseInt(req.params.userId);
     const fileId = parseInt(req.params.fileId);
-    try{
-        const result = await FileServices.getUserFile(userId,fileId);        
-        res.json({message: 'lấy file thành công', file: result.file})
-    }catch(error){
-        console.error('Lỗi khi lấy file: ',error)
-        res.status(500).json({error: 'Lỗi khi lấy file', info: error.message})
+    try {
+        const result = await FileServices.getUserFile(userId, fileId);
+        res.json({ message: 'lấy file thành công', file: result.file })
+    } catch (error) {
+        console.error('Lỗi khi lấy file: ', error)
+        res.status(500).json({ error: 'Lỗi khi lấy file', info: error.message })
     }
 }
 
-const deleteUserFile = async (req,res) => {
-   const {userId, fileIds} = req.body;
-    try{
-        const result = await FileServices.deleteUserFile(userId,fileIds)
-        res.json({message : result.message})
-    }catch(err){
-        console.error('Lỗi khi xóa file: ',err)
+const deleteUserFile = async (req, res) => {
+    const { userId, fileIds } = req.body;
+    try {
+        const result = await FileServices.deleteUserFile(userId, fileIds)
+        res.json({ message: result.message })
+    } catch (err) {
+        console.error('Lỗi khi xóa file: ', err)
         res.status(500).json({
             error: "lỗi xóa file",
             info: err.message
         })
-        
+
     }
 }
 
-const getFileType = async(req, res)=>{
-  const type = req.params.type;
-  const userId = req.params.userId;
-  try{
-    const result = await FileServices.getFileType(userId, type)
-    res.json({message: 'lấy file thành công',
-       file: result.file})
-  }catch(err){
-    console.log(err);
-    res.status(500).json({error: 'Lỗi khi lấy file', info: err.message})
-  }
+const getFileType = async (req, res) => {
+    const type = req.params.type;
+    const userId = req.params.userId;
+    try {
+        const result = await FileServices.getFileType(userId, type)
+        res.json({
+            message: 'lấy file thành công',
+            file: result.file
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Lỗi khi lấy file', info: err.message })
+    }
 }
 
 // {
@@ -169,10 +172,10 @@ const getFileType = async(req, res)=>{
 //   "expiresDate": "2025/08/17"
 // }
 const createFileShare = async (req, res) => {
-    const { userId, fileId, permission, expiresDate} = req.body;
+    const { userId, fileId, permission, expiresDate } = req.body;
     console.log('Tạo chia sẻ file:', { userId, fileId, permission, expiresDate });
     try {
-        const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate );
+        const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate);
         res.json({ message: result.message, fileShare: result.fileShare });
     } catch (error) {
         console.error('Lỗi khi tạo chia sẻ file:', error);
@@ -211,7 +214,7 @@ const getUserFileShare = async (req, res) => {
 const changePermissionFileShare = async (req, res) => {
     const { fileShareId, userId, permission } = req.body;
     try {
-        const result = await FileServices.changePermissionFileShare(fileShareId,userId, permission);
+        const result = await FileServices.changePermissionFileShare(fileShareId, userId, permission);
         res.json({ message: result.message, fileShare: result.fileShare });
     } catch (error) {
         console.error('Lỗi khi thay đổi quyền chia sẻ file:', error);
