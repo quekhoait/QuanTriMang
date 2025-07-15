@@ -8,7 +8,7 @@ const genneralAccesToken  =(payload)=>{
 }
 
 const genneralRefreshToken = (payload)=>{
-  const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN, {expiresIn: '365d'})
+  const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN, {expiresIn: '3600s'})
   return refreshToken
 }
 

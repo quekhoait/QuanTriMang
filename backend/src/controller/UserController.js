@@ -101,7 +101,7 @@ const refreshToken = async(req, res)=>{
     if(!refreshToken) res.sendStatus(401);
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, data)=>{
       if(err) res.sendStatus(403)
-        const accessToken = jwt.sign({id: data.id}, process.env.ACCESS_TOKEN,{expiresIn: '30s'})
+        const accessToken = jwt.sign({id: data.id}, process.env.ACCESS_TOKEN,{expiresIn: '3600s'})
       res.json({accessToken})
     })
   }catch(err){

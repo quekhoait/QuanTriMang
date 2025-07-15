@@ -3,6 +3,7 @@ const streamifier = require('streamifier')
 const { cloudinary } = require('../../cloudinary.js');
 const dotenv = require('dotenv');
 dotenv.config();
+const path = require("path");
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const dangerousExtensions = [
@@ -19,13 +20,13 @@ const createFile = async (req, res) => {
     const fileName = (req.file?.originalname || req.body.fileName)?.trim();
     const fileSize = req.file?.size || 0;
     const fileType = req.file?.mimetype.trim() || null;
-    const userId = parseInt(req.body.userId)
+    const userId = parseInt(req.body.userId);
     const parentFolderId = parseInt(req.body.parentFolderId) || null;
     const isFolder = parseInt(req.body.isFolder) || 0;
     const updateDate = null;
- 
 
-    if (req.user.id !== userId) {
+    //Kiểm tra quyenf hợp lệ khi đăng nhập và up
+     if (req.user.id !== userId) {
         return res.status(403).json({ error: 'Bạn không có quyền upload file cho user này.' });
     }
     try {
@@ -47,25 +48,27 @@ const createFile = async (req, res) => {
             return res.json({ message: 'Tạo thư mục thành công!', file: newFolder });
         }
 
-        if (!req.file) {
-            return res.status(400).json({ error: 'Không có file nào được upload.' });
+    
+          if (!req.file) {
+            return res.status(400).json({ message: 'Không có file nào được upload.' });
         }
 
-        if (dangerousExtensions.includes(fileName)) {
-            return res.status(415).json({ error: 'Định dạng tệp không được phép.' });
+          const fileExt = path.parse(req.file?.originalname).ext; // .pdf
+      //  Kiểm tra định dạng MIME hợp lệ
+        if (dangerousExtensions.includes(fileExt)) {
+            return res.status(415).json({ message: 'Định dạng tệp không được phép.' });
         }
 
         //  Giới hạn dung lượng file
         if (fileSize > MAX_FILE_SIZE) {
-            return res.status(413).json({ error: 'Tệp quá lớn. Giới hạn là 10MB.' });
+            return res.status(413).json({ message: 'Tệp quá lớn. Giới hạn là 10MB.' });
         }
 
-        const path = require("path");
 
         const originalName = req.file.originalname; // Detai BaitapLon2022 (1).pdf
         const fileNameWithExt = path.parse(originalName).base; // giữ cả tên + đuôi
         const fileNameWithoutExt = path.parse(originalName).name;
-        const fileExt = path.parse(originalName).ext; // .pdf
+      
 
         const publicId = `${fileNameWithoutExt}${fileExt}`; // => Detai BaitapLon2022 (1).pdf
 
@@ -111,8 +114,12 @@ const createFile = async (req, res) => {
 
 //Lấy list file tại thư mục nào đó
 const getUserFiles = async (req, res) => {
-    const userId = req.params.userId;
+    const userId = parseInt(req.params.userId);
     const parentFolderId = req.params.parentFolderId === 'NULL' ? null : parseInt(req.params.parentFolderId);
+    
+    if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
+    }
     try {
         const result = await FileServices.getUserFiles(userId, parentFolderId);
         res.json({ message: 'Lấy danh sách tệp thành công', files: result.files });
@@ -126,22 +133,29 @@ const getUserFiles = async (req, res) => {
 const getUserFile = async (req, res) => {
     const userId = parseInt(req.params.userId);
     const fileId = parseInt(req.params.fileId);
-    try {
-        const result = await FileServices.getUserFile(userId, fileId);
-        res.json({ message: 'lấy file thành công', file: result.file })
-    } catch (error) {
-        console.error('Lỗi khi lấy file: ', error)
-        res.status(500).json({ error: 'Lỗi khi lấy file', info: error.message })
+
+    if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
+    }
+    try{
+        const result = await FileServices.getUserFile(userId,fileId);        
+        res.json({message: 'lấy file thành công', file: result.file})
+    }catch(error){
+        console.error('Lỗi khi lấy file: ',error)
+        res.status(500).json({error: 'Lỗi khi lấy file', info: error.message})
     }
 }
 
-const deleteUserFile = async (req, res) => {
-    const { userId, fileIds } = req.body;
-    try {
-        const result = await FileServices.deleteUserFile(userId, fileIds)
-        res.json({ message: result.message })
-    } catch (err) {
-        console.error('Lỗi khi xóa file: ', err)
+const deleteUserFile = async (req,res) => {
+   const {userId, fileIds} = req.body;
+   if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
+    }
+    try{
+        const result = await FileServices.deleteUserFile(userId,fileIds)
+        res.json({message : result.message})
+    }catch(err){
+        console.error('Lỗi khi xóa file: ',err)
         res.status(500).json({
             error: "lỗi xóa file",
             info: err.message
@@ -150,19 +164,20 @@ const deleteUserFile = async (req, res) => {
     }
 }
 
-const getFileType = async (req, res) => {
-    const type = req.params.type;
-    const userId = req.params.userId;
-    try {
-        const result = await FileServices.getFileType(userId, type)
-        res.json({
-            message: 'lấy file thành công',
-            file: result.file
-        })
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Lỗi khi lấy file', info: err.message })
+const getFileType = async(req, res)=>{
+  const type = req.params.type;
+  const userId = parseInt(req.params.userId);
+  if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
     }
+  try{
+    const result = await FileServices.getFileType(userId, type)
+    res.json({message: 'lấy file thành công',
+       file: result.file})
+  }catch(err){
+    console.log(err);
+    res.status(500).json({error: 'Lỗi khi lấy file', info: err.message})
+  }
 }
 
 // {
@@ -172,8 +187,10 @@ const getFileType = async (req, res) => {
 //   "expiresDate": "2025/08/17"
 // }
 const createFileShare = async (req, res) => {
-    const { userId, fileId, permission, expiresDate } = req.body;
-    console.log('Tạo chia sẻ file:', { userId, fileId, permission, expiresDate });
+    const { userId, fileId, permission, expiresDate} = req.body;
+  if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
+    }
     try {
         const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate);
         res.json({ message: result.message, fileShare: result.fileShare });
@@ -185,6 +202,9 @@ const createFileShare = async (req, res) => {
 
 const getFileShare = async (req, res) => {
     const userId = parseInt(req.params.userId);
+    if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
+    }
     try {
         const result = await FileServices.getFileShare(userId);
         res.json({ message: result.message, fileShares: result.fileShares });
@@ -196,6 +216,9 @@ const getFileShare = async (req, res) => {
 
 const getUserFileShare = async (req, res) => {
     const userId = parseInt(req.params.userId);
+    if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
+    }
     try {
         const result = await FileServices.getUserFileShare(userId);
         res.json({ message: result.message, fileShares: result.fileShares });
@@ -214,8 +237,9 @@ const getUserFileShare = async (req, res) => {
 const changePermissionFileShare = async (req, res) => {
     const { fileShareId, userId, permission } = req.body;
     try {
-        const result = await FileServices.changePermissionFileShare(fileShareId, userId, permission);
-        res.json({ message: result.message, fileShare: result.fileShare });
+        const result = await FileServices.changePermissionFileShare(fileShareId,userId, permission);
+        console.log(result)
+        res.json({ message: result.message, fileShare: result.fileShares });
     } catch (error) {
         console.error('Lỗi khi thay đổi quyền chia sẻ file:', error);
         res.status(500).json({ error: 'Lỗi khi thay đổi quyền chia sẻ file.', info: error.message });

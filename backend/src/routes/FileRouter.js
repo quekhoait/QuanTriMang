@@ -13,27 +13,28 @@ const {
 
 } = require('../controller/FileController');
 
-const { authMiddleware } = require("../authMiddleware/authMiddleware");
+const { authMiddleware, uploadLimiter } = require("../authMiddleware/authMiddleware");
 
 
 
 
 
-const upload = multer();
 
+const storage = multer.memoryStorage(); // Lưu vào RAM thay vì ổ đĩa
+const upload = multer({ storage: storage });
 
 //  api/file
 
-router.post('/upload', authMiddleware, upload.single('file'), createFile);
+router.post('/upload', authMiddleware, uploadLimiter, upload.single('file'), createFile);
 
 
-router.get('/listFile/:userId/:parentFolderId', getUserFiles);
-router.get('/oneFile/:userId/:fileId',getUserFile);
-router.delete('/deleteFile',deleteUserFile);
-router.get('/getFileType/:userId/:type', getFileType);
+router.get('/listFile/:userId/:parentFolderId', authMiddleware, getUserFiles);
+router.get('/oneFile/:userId/:fileId', authMiddleware, getUserFile);
+router.delete('/deleteFile', authMiddleware, deleteUserFile);
+router.get('/getFileType/:userId/:type',authMiddleware,  getFileType);
 router.post('/createFileShare',authMiddleware, createFileShare);
-router.get('/receivedFileShare/:userId', getFileShare);
-router.get('/sharedFile/:userId', getUserFileShare);
+router.get('/receivedFileShare/:userId',authMiddleware,  getFileShare);
+router.get('/sharedFile/:userId',authMiddleware,  getUserFileShare);
 router.put('/changePermissionFileShare', changePermissionFileShare);
 
 
