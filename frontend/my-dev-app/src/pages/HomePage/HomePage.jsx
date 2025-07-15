@@ -6,8 +6,6 @@ import { AllFileComponent } from '../../components/AllFileComponent/AllFileCompo
 import ImageComponent from '../../components/ImageComponent/ImageComponent';
 import VideoComponent from '../../components/VideoComponent/VideoComponent';
 import DocumentsComponent from '../../components/DocumentsComponent/DocumentsComponent';
-import MusicComponent from '../../components/MusicComponent/MusicComponent'
-import OtherComponent from '../../components/OtherComponent/OtherComponent';
 import FileShareComponent from '../../components/FileShareComponent/FileShareComponent';
 
 const HomePage = ({event}) => {  
@@ -31,8 +29,6 @@ const HomePage = ({event}) => {
             {openItem === 'Image' &&     <ImageComponent />}
             {openItem === 'Video' &&     <VideoComponent />}
             {openItem === 'Documents' &&  <DocumentsComponent />}
-            {openItem === 'Music' &&     <MusicComponent/>}
-            {openItem === 'Other' &&  <OtherComponent />}
             {openItem === 'FileShare' &&  <FileShareComponent />}
           </div>
         </div>

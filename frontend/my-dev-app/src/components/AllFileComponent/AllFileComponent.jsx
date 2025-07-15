@@ -22,7 +22,8 @@ export const AllFileComponent = () => {
 
 useEffect(() => {
   if (account?.data?.id != null) {
-    getListFileParent(rowId); // ✔️ truyền đúng rowId
+  getListFileParent(rowId);
+
   }
 }, [account?.data?.id, rowId]);
 
