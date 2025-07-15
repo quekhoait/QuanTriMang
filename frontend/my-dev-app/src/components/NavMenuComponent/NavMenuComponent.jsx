@@ -48,21 +48,10 @@ const NavMenuComponent = ({ openItem, onChangeItem }) => {
           onClick={() => onChangeItem('Documents')}
           flag={openItem === 'Documents'}
         />
-        <MenuItemComponent
-          fileName={"Music"}
-          img={FaMusic}
-          onClick={() => onChangeItem('Music')}
-          flag={openItem === 'Music'}
-        />
-        <MenuItemComponent
-          fileName={"Orther"}
-          img={FaEllipsisH}
-          onClick={() => onChangeItem('Orther')}
-          flag={openItem === 'Orther'}
-        />
+  
       </div>
 
-      <div className="pt-[16px] h-[300px]">
+      <div className="pt-[16px] h-[380px]">
         <div className="flex flex-col items-center justify-between rounded-md h-[100%]">
           <MenuItemComponent
             fileName={"File share"}

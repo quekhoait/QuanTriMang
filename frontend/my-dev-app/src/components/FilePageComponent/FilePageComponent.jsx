@@ -10,6 +10,8 @@ import { FormShareComponent } from "../FormShareComponent/FormShareComponent";
 import FileShareComponent from "../FileShareComponent/FileShareComponent";
 import { fetchWithAuth } from "../../utils/authFetch";
 
+import { ClipLoader } from "react-spinners";
+
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
   //listFiles json dữ liệu tệp tin lấy api/file/listFile/:userId/:parentFolderId
   const { getListFileParent, removeFile } = useFile();
@@ -138,7 +140,6 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
   //Laayus token
   const token = localStorage.getItem('accessToken');
   const createFolder = async () => {  
-    console.log(token)
     try {
       const response = await fetchWithAuth('http://localhost:5999/api/file/upload', {
         method: "POST",
@@ -213,6 +214,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
       uploadFilde(file)
     }
   }
+  const [isUploading, setIsUploading] = useState(false);
 
   const uploadFilde = async (fileUpload) => {
     const isDuplicate = listFiles.find(file => file.fileName === fileUpload.name);
@@ -236,6 +238,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     //formData.append("fileSize", fileUpload.size);
     formData.append("isFolder", 0);
     formData.append("parentFolderId", rowId);
+    setIsUploading(true);
     try {
       const response = await fetchWithAuth('http://localhost:5999/api/file/upload', {
         method: "POST",
@@ -248,7 +251,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
       const data = await response.json();
       if (response.ok) {
         alert("Upload file thành công");
-        getListFileParent(rowId);
+
       } else {
         alert("Upload file thất bại" + data.message)
       }
@@ -256,6 +259,9 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     } catch (err) {
       alert("Lỗi up file" + err.message)
     }
+    finally {
+      setIsUploading(false); // ✅ Dừng loading
+  }
   }
 
 
@@ -328,9 +334,35 @@ const handleLoad = ()=>{
 }
 
 
+const [loading, setLoading] = useState(true);
+const [data, setData] = useState(null);
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5999/api/files");
+      const json = await res.json();
+      setData(json);
+    } catch (err) {
+      console.error("Lỗi khi lấy dữ liệu:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
+
+
   return (
     <div className="p-6">
-
+    {isUploading && (
+      <div className="flex justify-center mt-10">
+                    <ClipLoader size={40} color="#36d7b7" />
+                    <p className="ml-2">Đang tải dữ liệu...</p>
+                  </div>
+    )}
+      {}
       {/* Header */}
       {isShowForm && (
                   <FormAuthenComponent 
@@ -406,7 +438,13 @@ const handleLoad = ()=>{
       </div>
 
       <div className="max-h-[460px] overflow-y-auto border rounded-md">
-        <table className="w-full text-left min-w-[600px]">
+          {loading ?(
+            <div className="flex justify-center mt-10">
+                    <ClipLoader size={40} color="#36d7b7" />
+                    <p className="ml-2">Đang tải dữ liệu...</p>
+                  </div>
+          ) : (
+            <table className="w-full text-left min-w-[600px]">
           <thead className="sticky top-0 bg-white ">
             <tr className="border-b">
               <th className="p-2 text-blue-700 w-8">
@@ -490,6 +528,10 @@ const handleLoad = ()=>{
             )}
           </tbody>
         </table>
+          )}
+
+
+        
       </div>
     </div>
 

@@ -24,7 +24,7 @@ export const FileProvider = ({ children }) => {
     const getListFileParent = async (rowId) => {  
         const parentFolderId = rowId === undefined ? null : rowId;
         try {
-            const response = await fetch(`http://localhost:5999/api/file/listFile/${userId}/${parentFolderId === null ? 'NULL' : rowId}`, {
+            const response = await fetchWithAuth(`http://localhost:5999/api/file/listFile/${userId}/${parentFolderId === null ? 'NULL' : rowId}`, {
                 method: "GET",
                 headers: {
                   'Authorization': 'Bearer ' + token,
