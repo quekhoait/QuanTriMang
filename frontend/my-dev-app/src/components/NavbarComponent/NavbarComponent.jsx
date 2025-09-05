@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import imageUser from '../../assets/user.png'
 import { useUser } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,12 @@ const NavbarComponent = () => {
     const handleHomePage = ()=>{
         navigate("/")
     }
+    useEffect(()=>{
+      const token = localStorage.getItem('accessToken');
+      if(!token){
+        navigate('/account/login', {replace: true})
+      }
+    })
 
     //Đăng xuất user
     const handleLogout = async()=>{
@@ -29,7 +35,7 @@ const NavbarComponent = () => {
         if(response.ok){
           alert("Đăng xuát thành công");
           localStorage.removeItem('accessToken');
-          navigate('/account/login');
+          navigate('/account/login', {replace: true});
         }
       }catch(err){
         alert("Lỗi đăng xuất" + err.message)

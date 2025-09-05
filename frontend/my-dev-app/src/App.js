@@ -1,11 +1,19 @@
 
 import './App.css';
-import {Route, Routes} from 'react-router-dom'
+import {Route, Routes, useNavigate} from 'react-router-dom'
 import routes from './routes';
 import { UserProvider } from './contexts/UserContext';
 import { FileProvider } from './contexts/FileContext';
+import { useEffect } from 'react';
 
 function App() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem('accessToken');
+  if(!token){
+    navigate('/account/login')
+  }
+
+
   return (
     <div className="App h-[100%] bg-[#ebebeb]">
       <UserProvider>

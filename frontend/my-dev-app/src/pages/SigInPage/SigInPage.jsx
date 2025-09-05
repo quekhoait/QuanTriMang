@@ -1,6 +1,6 @@
 import { data, useNavigate } from 'react-router-dom';
 import image from '../../assets/anhnen3.png';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from '../../contexts/UserContext';
 
 export default function SignInPage() {
@@ -22,6 +22,12 @@ export default function SignInPage() {
       setEye(true);
     }
   }
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      navigate("/", { replace: true }); // ✅ Đã login thì đá ra ngoài
+    }
+  }, []);
 
     const handleSubmitSigIn = async(e)=>{
       e.preventDefault();
@@ -40,7 +46,7 @@ export default function SignInPage() {
           localStorage.setItem('accessToken', data.accessToken);
         // localStorage.setItem('refreshToken', data.refreshToken);
           setAccessToken(data.accessToken);
-          navigate('/')
+          navigate('/', { replace: true })
         }else{
           setError("Lỗi " + data.message)
         }
@@ -109,6 +115,7 @@ export default function SignInPage() {
           </button>
         </div>
       </div>
+      
     </div>
   );
 }
