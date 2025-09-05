@@ -1,7 +1,7 @@
 const express = require('express');
-const { demo } = require('../controller/FileController');
+const { uploadFile, getFileByKey } = require('../controller/FileController');
 const router = express.Router();
 
-router.post('/demo',demo);
-
+router.post('/upload',uploadFile);
+router.get('/demo',getFileByKey);
 module.exports = router;

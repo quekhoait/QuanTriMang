@@ -10,7 +10,8 @@ const {
     getFileShare,
     getUserFileShare,
     changePermissionFileShare,
-    demo
+    demo,
+    demo2
 
 } = require('../controller/FileController');
 
@@ -22,7 +23,7 @@ const upload = multer({ storage: storage });
 
 //  api/file
 
-router.post('/upload', authMiddleware, uploadLimiter, upload.single('file'), createFile);
+router.post('/upload', uploadLimiter, upload.single('file'), createFile);
 router.get('/listFile/:userId/:parentFolderId', authMiddleware, getUserFiles);
 router.get('/oneFile/:userId/:fileId', authMiddleware, getUserFile);
 router.delete('/deleteFile', authMiddleware, deleteUserFile);
@@ -32,6 +33,7 @@ router.get('/receivedFileShare/:userId',authMiddleware,  getFileShare);
 router.get('/sharedFile/:userId',authMiddleware,  getUserFileShare);
 router.put('/changePermissionFileShare', changePermissionFileShare);
 router.post('/demo',upload.single('file'), demo);
+router.get('/demo2',demo2);
 
 
 

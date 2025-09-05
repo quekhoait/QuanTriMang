@@ -1,7 +1,18 @@
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const ParentFolder = 'Demo';
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'Demo/');
+        //tạo đường dẫn thư mục của user và parentFolder
+        console.log("========" + req.query.userId);
+        const userId = req.query.userId || 'unknow';
+        const uploadPath = path.join(ParentFolder, `User_${userId}`);
+        //tạo đường dẫn nếu chưa tồn tại
+        fs.mkdirSync(uploadPath, { recursive: true });
+
+        cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname);
@@ -10,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage }).single('file');
 
-const demo = async (req, res) => {
+const uploadFile = async (req, res) => {
     upload(req, res, (err) => {
         if (err) {
             console.error('Lỗi khi upload:', err);
@@ -34,6 +45,18 @@ const demo = async (req, res) => {
     });
 };
 
+const getFileByKey = async (req, res) => {
+    //C:\Users\Latitude 3400\Workspace\2025\Test\QuanTriMang2\QuanTriMang\NAS\src\controller\Demo\User_1\1757085628580-illust_126291174_20250413_2238151.jpg
+    try {
+        const filePath = req.query.path; // ?path=D:/NAS_STORAGE/user_1/1693748293_baocao.pdf
+        res.sendFile(filePath); // cần root để Express resolve tuyệt đối
+    } catch (err) {
+        console.error('Lỗi khi demo:', err);
+        res.status(500).json({ error: 'Lỗi khi demo.', info: err.message });
+    }
+}
+
 module.exports = {
-    demo
+    uploadFile,
+    getFileByKey
 }

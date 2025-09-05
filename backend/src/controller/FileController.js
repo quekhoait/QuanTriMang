@@ -26,9 +26,9 @@ const createFile = async (req, res) => {
     const updateDate = null;
 
     //Kiểm tra quyenf hợp lệ khi đăng nhập và up
-    if (req.user.id !== userId) {
-        return res.status(403).json({ error: 'Bạn không có quyền upload file cho user này.' });
-    }
+    // if (req.user.id !== userId) {
+    //     return res.status(403).json({ error: 'Bạn không có quyền upload file cho user này.' });
+    // }
     try {
         if (isFolder === 1) {
             // 👈 Trường hợp tạo FOLDER, không upload Cloudinary
@@ -72,25 +72,47 @@ const createFile = async (req, res) => {
 
         const publicId = `${fileNameWithoutExt}${fileExt}`; // => Detai BaitapLon2022 (1).pdf
 
-
-        const result = await new Promise((resolve, reject) => {
-            streamifier.createReadStream(req.file.buffer).pipe(
-                cloudinary.uploader.upload_stream(
-                    {
-                        folder: `uploads/user_${userId}`,
-                        public_id: publicId,                // 👈 giữ đuôi .pdf
-                        resource_type: "raw",
-                        use_filename: true,
-                        unique_filename: false,
-                        overwrite: true
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                )
-            );
+        // Tạo form-data để gửi sang backend 2
+        const form = new FormData();
+        form.append('file', req.file.buffer, {
+            filename: req.file.originalname, // hoặc Date.now() + '.bin'
+            contentType: req.file.mimetype
         });
+
+        form.append('userId', userId);
+        let result; 
+        try {
+            // Gửi sang backend 2
+            result = await axios.post(`http://localhost:3000/upload?userId=${userId}`, form, {
+                headers: form.getHeaders(),
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity
+            });
+
+            // res.json({ message: result.data.message });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send('Lỗi khi gửi file sang Backend2');
+        }
+
+        // const result = await new Promise((resolve, reject) => {
+        //     streamifier.createReadStream(req.file.buffer).pipe(
+        //         cloudinary.uploader.upload_stream(
+        //             {
+        //                 folder: `uploads/user_${userId}`,
+        //                 public_id: publicId,                // 👈 giữ đuôi .pdf
+        //                 resource_type: "raw",
+        //                 use_filename: true,
+        //                 unique_filename: false,
+        //                 overwrite: true
+        //             },
+        //             (error, result) => {
+        //                 if (error) reject(error);
+        //                 else resolve(result);
+        //             }
+        //         )
+        //     );
+        // });
 
         const newFile = await FileServices.createFile({
             userId,
@@ -99,13 +121,13 @@ const createFile = async (req, res) => {
             fileSize,
             fileType,
             isFolder: 0,
-            keyPath: result.secure_url,
-            publicId: result.public_id,
+            keyPath: result.data.file.path,
+            publicId: null,
             createDate: new Date(),
             updateDate,
         });
 
-        res.json({ message: 'Tải lên thành công!', file: newFile });
+        res.json({ message: 'Tải lên thành công!',message2 : result.data.message, file: newFile });
     } catch (error) {
         res.status(500).json({ error: 'Lỗi tải lên tệp tin/thư mục.', info: error.message });
     }
@@ -273,6 +295,22 @@ const demo = async (req, res) => {
     }
 }
 
+const demo2 = async (req,res) => {
+    const userId = parseInt(req.query.userId);
+    const fileId = parseInt(req.query.fileId);
+
+    // if (req.user.id !== userId) {
+    //     return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
+    // }
+    try {
+        const result = await FileServices.getUserFile(userId, fileId);
+        res.json({ message: 'lấy file thành công', file: result.file })
+    } catch (error) {
+        console.error('Lỗi khi lấy file: ', error)
+        res.status(500).json({ error: 'Lỗi khi lấy file', info: error.message })
+    }
+}
+
 module.exports = {
     createFile,
     getUserFiles,
@@ -282,6 +320,6 @@ module.exports = {
     createFileShare,
     getFileShare,
     getUserFileShare,
-    changePermissionFileShare, demo
+    changePermissionFileShare, demo,demo2
 };
 
