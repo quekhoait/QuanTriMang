@@ -1,6 +1,5 @@
 const FileServices = require('../services/FileServices.js');
 const streamifier = require('streamifier')
-const { cloudinary } = require('../../cloudinary.js');
 const dotenv = require('dotenv');
 const axios = require('axios');
 const FormData = require('form-data');
@@ -26,9 +25,9 @@ const createFile = async (req, res) => {
     const updateDate = null;
 
     //Kiểm tra quyenf hợp lệ khi đăng nhập và up
-    // if (req.user.id !== userId) {
-    //     return res.status(403).json({ error: 'Bạn không có quyền upload file cho user này.' });
-    // }
+    if (req.user.id !== userId) {
+        return res.status(403).json({ error: 'Bạn không có quyền upload file cho user này.' });
+    }
     try {
         if (isFolder === 1) {
             // 👈 Trường hợp tạo FOLDER, không upload Cloudinary
@@ -41,7 +40,6 @@ const createFile = async (req, res) => {
                 fileType: null,
                 isFolder,
                 keyPath: null,  // hoặc null nếu không dùng
-                publicId: null,
                 createDate: new Date(),
                 updateDate: null,
             });
@@ -83,7 +81,7 @@ const createFile = async (req, res) => {
         let result; 
         try {
             // Gửi sang backend 2
-            result = await axios.post(`http://localhost:3000/upload?userId=${userId}`, form, {
+            result = await axios.post(`${process.env.API_SERVER}:3000/upload?userId=${userId}`, form, {
                 headers: form.getHeaders(),
                 maxContentLength: Infinity,
                 maxBodyLength: Infinity
@@ -154,20 +152,26 @@ const getUserFiles = async (req, res) => {
 };
 
 //lấy chính xác 1 file nào đó
-const getUserFile = async (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const fileId = parseInt(req.params.fileId);
+const getFileByKeyPath = async (req, res) => {
+  try {
+    const keyPath  = req.query.path;
+    // Gọi sang backend 2 để lấy file
+    const response = await axios.get(
+      `${process.env.API_SERVER}:3000/get-file?path=${keyPath}`,
+      { responseType: "stream" } // Quan trọng để lấy file dạng stream
+    );
+        // Lấy tên file từ path
+  //  const filename = keyPath.split(/[/\\]/).pop();
+    // Copy headers để frontend biết loại file
+    res.setHeader("Content-Type", response.headers["content-type"]);
+    res.setHeader("Content-Disposition", `inline; filename="${keyPath}"`);
+    // // Pipe dữ liệu từ backend 2 về frontend
+    response.data.pipe(res);
 
-    if (req.user.id !== userId) {
-        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
-    }
-    try {
-        const result = await FileServices.getUserFile(userId, fileId);
-        res.json({ message: 'lấy file thành công', file: result.file })
-    } catch (error) {
-        console.error('Lỗi khi lấy file: ', error)
-        res.status(500).json({ error: 'Lỗi khi lấy file', info: error.message })
-    }
+  } catch (err) {
+     console.error("Lỗi khi proxy file từ backend 2:",  err.message);
+    res.status(500).json({ message: "Không lấy được file từ backend 2" });
+  }
 }
 
 const deleteUserFile = async (req, res) => {
@@ -314,7 +318,7 @@ const demo2 = async (req,res) => {
 module.exports = {
     createFile,
     getUserFiles,
-    getUserFile,
+    getFileByKeyPath,
     deleteUserFile,
     getFileType,
     createFileShare,

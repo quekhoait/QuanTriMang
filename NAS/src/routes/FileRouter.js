@@ -3,5 +3,5 @@ const { uploadFile, getFileByKey } = require('../controller/FileController');
 const router = express.Router();
 
 router.post('/upload',uploadFile);
-router.get('/demo',getFileByKey);
+router.get('/get-file', getFileByKey);
 module.exports = router;

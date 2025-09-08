@@ -9,7 +9,7 @@ const VideoComponent = () => {
   
   useEffect(() => {
     if (account?.data?.id != null) {
-      getFileType("Video"); // ✔️ truyền đúng rowId
+      getFileType("video"); // ✔️ truyền đúng rowId
     }
   }, [account?.data?.id]);
   return (

@@ -3,7 +3,7 @@ const multer = require('multer');
 const {
     createFile,
     getUserFiles,
-    getUserFile,
+    getFileByKeyPath,
     deleteUserFile,
     getFileType,
     createFileShare,
@@ -23,12 +23,12 @@ const upload = multer({ storage: storage });
 
 //  api/file
 
-router.post('/upload', uploadLimiter, upload.single('file'), createFile);
+router.post('/upload', authMiddleware, uploadLimiter, upload.single('file'), createFile);
 router.get('/listFile/:userId/:parentFolderId', authMiddleware, getUserFiles);
-router.get('/oneFile/:userId/:fileId', authMiddleware, getUserFile);
+router.get('/oneFile', getFileByKeyPath);
 router.delete('/deleteFile', authMiddleware, deleteUserFile);
 router.get('/getFileType/:userId/:type',authMiddleware,  getFileType);
-router.post('/createFileShare',authMiddleware, createFileShare);
+router.post('/createFileShare', authMiddleware, createFileShare);
 router.get('/receivedFileShare/:userId',authMiddleware,  getFileShare);
 router.get('/sharedFile/:userId',authMiddleware,  getUserFileShare);
 router.put('/changePermissionFileShare', changePermissionFileShare);

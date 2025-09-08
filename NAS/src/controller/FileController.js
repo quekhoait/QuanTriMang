@@ -1,7 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const ParentFolder = 'Demo';
+const ParentFolder = 'C:\\uploads\\NAS\\Demo';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -46,15 +46,25 @@ const uploadFile = async (req, res) => {
 };
 
 const getFileByKey = async (req, res) => {
-    //C:\Users\Latitude 3400\Workspace\2025\Test\QuanTriMang2\QuanTriMang\NAS\src\controller\Demo\User_1\1757085628580-illust_126291174_20250413_2238151.jpg
-    try {
-        const filePath = req.query.path; // ?path=D:/NAS_STORAGE/user_1/1693748293_baocao.pdf
-        res.sendFile(filePath); // cần root để Express resolve tuyệt đối
-    } catch (err) {
-        console.error('Lỗi khi demo:', err);
-        res.status(500).json({ error: 'Lỗi khi demo.', info: err.message });
+  try {
+    let filePath =  req.query.path; 
+    if (!filePath) return res.status(400).json({ message: "Missing path" });
+
+    // Chuyển \ thành / để tránh lỗi khi gọi từ Windows
+    filePath = filePath.replace(/\\/g, "/");
+
+    filePath = path.normalize(filePath);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found" });
     }
-}
+
+    res.sendFile(filePath);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error reading file" });
+  }
+};
 
 module.exports = {
     uploadFile,

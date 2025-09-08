@@ -3,7 +3,6 @@ const {
 	pool,
 	poolConnect
 } = require('../../db');
-const { deleteCloudinaryFile } = require('../../cloudinary');
 const { request } = require('express');
 
 const createFile = async ({
@@ -14,7 +13,6 @@ const createFile = async ({
 	fileType = null,
 	isFolder = 1,
 	keyPath,
-	publicId,
 	createDate,
 	updateDate = null,
 }) => {
@@ -28,7 +26,6 @@ const createFile = async ({
 		request.input('fileType', sql.NVarChar, fileType);
 		request.input('isFolder', sql.Bit, isFolder);
 		request.input('keyPath', sql.NVarChar, keyPath);
-		request.input('publicId', sql.NVarChar, publicId);
 		request.input('createDate', sql.DateTime, createDate);
 		request.input('updateDate', sql.DateTime, updateDate);
     if(fileSize > 1024 * 10 *1024){
@@ -39,8 +36,8 @@ const createFile = async ({
     }
 
 		const result = await request.query(`
-            INSERT INTO Files (userId, parentFolderId, fileName, fileSize, fileType, isFolder, keyPath, publicId, createDate, updateDate)
-            VALUES (@userId, @parentFolderId, @fileName, @fileSize, @fileType, @isFolder, @keyPath, @publicId, @createDate, @updateDate);
+            INSERT INTO Files (userId, parentFolderId, fileName, fileSize, fileType, isFolder, keyPath, createDate, updateDate)
+            VALUES (@userId, @parentFolderId, @fileName, @fileSize, @fileType, @isFolder, @keyPath, @createDate, @updateDate);
             SELECT * FROM Files WHERE id = SCOPE_IDENTITY();
         `);
 		return {
@@ -202,10 +199,6 @@ const deleteUserFile = async (userId, listfileId) => {
 				await request.query("delete from FileShare where id = @id")
 				await request.query("delete from Files where userId = @userId and id = @id")
 
-				//xóa luôn tệp trên cloudinary
-				if (result.recordset[0].publicId) {
-					await deleteCloudinaryFile(result.recordset[0].publicId)
-				}
 				resultMessages.push(`🗑️ Đã xóa file "${file.fileName}".`);
 			} else {
 				//thứ tự xóa từ trái sang phải, con cấp cao nhất về cấp thấp

@@ -8,6 +8,7 @@ const NavMenuComponent = ({ openItem, onChangeItem }) => {
 
   const { account, getUser } = useUser();
   const [dataUsed, setDataUsed] = useState(0)
+  console.log(account)
 
   const ToGB =(value)=>{
     setDataUsed((value / (1024 * 1024)).toFixed(2));

@@ -6,6 +6,7 @@ import { useUser } from '../../contexts/UserContext';
 export default function SignInPage() {
   const navigate = useNavigate();
   const handlSigUp= ()=>{
+    console.log(1);
     navigate('/account/regis')
   }
   const [error, setError] = useState();
@@ -106,13 +107,13 @@ export default function SignInPage() {
           </button>
         </form>
         <div className="text-center">
-          <button
+          <p
             className="mt-2 text-sm text-blue-500 hover:underline"
             type="button"
             onClick={handlSigUp}
           >
            Chưa có tài khoản? Đăng ký
-          </button>
+          </p>
         </div>
       </div>
       

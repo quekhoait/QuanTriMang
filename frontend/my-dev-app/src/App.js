@@ -9,9 +9,9 @@ import { useEffect } from 'react';
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem('accessToken');
-  if(!token){
-    navigate('/account/login')
-  }
+  // if(!token){
+  //   navigate('/account/login')
+  // }
 
 
   return (

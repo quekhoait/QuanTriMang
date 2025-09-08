@@ -1,15 +1,11 @@
 import { useState, useEffect, useRef, use } from "react";
-import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaTh, FaFolderOpen, FaShareAlt, FaTrash, FaPencilAlt, FaImages, FaAlignCenter, FaPhotoVideo } from "react-icons/fa";
-import { AiOutlineFolderAdd } from "react-icons/ai";
-import { CiMenuKebab } from "react-icons/ci";
-import { FaRegStar } from "react-icons/fa6";
+import { FaDownload, FaFolder, FaFilePdf, FaRedoAlt, FaFolderOpen, FaShareAlt, FaTrash, FaPencilAlt, FaImages, FaAlignCenter, FaPhotoVideo } from "react-icons/fa";
 import { useUser } from "../../contexts/UserContext";
 import { useFile } from "../../contexts/FileContext";
 import FormAuthenComponent from "../FormAuthenComponent/FormAuthenComponent";
 import { FormShareComponent } from "../FormShareComponent/FormShareComponent";
-import FileShareComponent from "../FileShareComponent/FileShareComponent";
 import { fetchWithAuth } from "../../utils/authFetch";
-
+import { IoDocumentText } from "react-icons/io5";
 import { ClipLoader } from "react-spinners";
 
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
@@ -353,6 +349,8 @@ useEffect(() => {
   fetchData();
 }, []);
 
+//Lây link từ server
+
 
   return (
     <div className="p-6">
@@ -499,7 +497,8 @@ useEffect(() => {
                     ) : file.fileType?.includes("video") ? (
                       <FaPhotoVideo className="text-blue-500" />
                     ) : (
-                      <FaAlignCenter className="text-gray-500" />
+                      <IoDocumentText className="text-gray-500" />
+                    //  {/* <FaAlignCenter className="text-gray-500" /> */}
                     )}
                     {renamingFile === file.fileName ? (
                       <input
@@ -514,8 +513,9 @@ useEffect(() => {
                         className="border px-2 py-1 rounded"
                       />
                     ) : (
+                      //////////////////////////////////
                       <a href= {file.keyPath}  target="_blank">{file.fileName}</a>
-      
+      /////////////////////////////////////////////
                     )}
                   </td>
                   {/* Hiển thị ngày tạo tập tin */}
