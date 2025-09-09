@@ -358,6 +358,38 @@ const changePermissionFileShare = async (fileShareId, userId, permission) => {
 		throw error;
 	}
 }
+
+const findFileByKeyWord = async (userId, keyword) => {
+	try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('userId', sql.Int, userId);
+		request.input('keyword', sql.NVarChar, `%${keyword}%`);
+		request.input('parentFolderId', sql.Int, parentFolderId);
+
+		let query = `
+			SELECT * FROM Files
+			WHERE userId = @userId AND fileName LIKE @keyword
+		`;
+
+		// if (parentFolderId === null) {
+		// 	query += ' AND parentFolderId IS NULL';
+		// } else {
+		// 	query += ' AND parentFolderId = @parentFolderId';
+		// }
+
+		const result = await request.query(query);
+
+		return {
+			message: 'Tìm kiếm thành công',
+			files: result.recordset
+		};
+	} catch (error) {
+		console.error('Lỗi khi tìm kiếm file theo từ khóa:', error);
+		throw error;
+	}
+};
+
 module.exports = {
 	createFile,
 	getUserFiles,
@@ -367,5 +399,6 @@ module.exports = {
 	createFileShare,
 	getFileShare,
 	getUserFileShare,
-	changePermissionFileShare
+	changePermissionFileShare,
+	findFileByKeyWord
 };

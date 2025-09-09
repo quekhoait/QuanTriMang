@@ -276,6 +276,28 @@ const changePermissionFileShare = async (req, res) => {
     }
 }
 
+
+const findFileByKeyWord = async (req, res) => {
+    const userId = parseInt(req.query.userId);
+    const keyword = (req.query.keyword || '').trim();
+
+    if (!keyword) {
+        return res.status(400).json({ error: 'Vui lòng nhập từ khóa tìm kiếm.' });
+    }
+
+    try {
+        const result = await FileServices.findFileByKeyWord(userId, keyword, parentFolderId);
+        res.json({
+            message: 'Tìm kiếm file thành công.',
+            files: result.files
+        });
+    } catch (error) {
+        console.error('Lỗi khi tìm kiếm file:', error);
+        res.status(500).json({ error: 'Lỗi khi tìm kiếm file.', info: error.message });
+    }
+};
+
+
 const demo = async (req, res) => {
     try {
         // Tạo form-data để gửi sang backend 2
@@ -324,6 +346,7 @@ module.exports = {
     createFileShare,
     getFileShare,
     getUserFileShare,
-    changePermissionFileShare, demo,demo2
+    changePermissionFileShare, demo,demo2,
+    findFileByKeyWord
 };
 
