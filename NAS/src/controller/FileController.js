@@ -66,7 +66,43 @@ const getFileByKey = async (req, res) => {
   }
 };
 
+const deleteFileByPath = async (req, res) => {
+	try {
+		let filePath = req.query.path;
+		if (!filePath) {
+			return res.status(400).json({ message: "Thiếu đường dẫn file cần xóa (query param: path)" });
+		}
+         console.log(filePath);
+
+		// Chuẩn hóa đường dẫn
+		filePath = filePath.replace(/\\/g, "/");
+		filePath = path.normalize(filePath);
+
+		// Kiểm tra file có tồn tại không
+		if (!fs.existsSync(filePath)) {
+			return res.status(404).json({ message: "❌ File không tồn tại" });
+		}
+       
+        
+		// Xóa file
+		fs.unlinkSync(filePath);
+
+		return res.status(200).json({
+			message: "🗑️ Đã xóa file thành công",
+			deletedPath: filePath
+		});
+	} catch (err) {
+		console.error("Lỗi khi xóa file:", err);
+		return res.status(500).json({
+			message: "Lỗi khi xóa file",
+			error: err.message
+		});
+	}
+};
+
+
 module.exports = {
     uploadFile,
-    getFileByKey
+    getFileByKey,
+    deleteFileByPath
 }
