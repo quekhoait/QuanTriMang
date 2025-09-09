@@ -48,7 +48,7 @@ const NavbarComponent = () => {
         <div className="flex items-center w-[40%] justify-between">
           <div className="flex items-center space-x-2">
             <img src="/logo192.png" alt="Logo" className="w-8 h-8" />
-            <span onClick = {handleHomePage} className="text-xl font-bold text-gray-800 cursor-pointer">TeraBox</span>
+            <span onClick = {handleHomePage} className="text-xl font-bold text-gray-800 cursor-pointer">CLOUD BOX</span>
           </div>
 
           {/* Search */}

@@ -260,6 +260,7 @@ const createFileShare = async (userId, fileId, permission, expiresDate = null) =
 
 		if (checkUserFile.recordset.length > 0) {
 			return {
+         success: false,
 				message: 'File đã được chia sẻ cho người dùng này.',
 				fileShare: checkUserFile.recordset[0]
 			}
@@ -358,6 +359,27 @@ const changePermissionFileShare = async (fileShareId, userId, permission) => {
 		throw error;
 	}
 }
+
+const getFileById = async (fileId) => {
+	try {
+		await poolConnect;
+		const request = pool.request();
+		request.input('id', sql.Int, fileId);
+
+		const result = await request.query(`
+        SELECT * FROM FILES WHERE ID = @id
+		`);
+      console.log(result)
+		return {
+			message: 'Lấy file thành công',
+			files: result.recordset
+		};
+	} catch (error) {
+		console.error('Lỗi khi lấy file:', error);
+		throw error;
+	}
+}
+
 module.exports = {
 	createFile,
 	getUserFiles,
@@ -367,5 +389,6 @@ module.exports = {
 	createFileShare,
 	getFileShare,
 	getUserFileShare,
-	changePermissionFileShare
+	changePermissionFileShare,
+  getFileById
 };

@@ -105,6 +105,7 @@ export const FileProvider = ({ children }) => {
 
 
     const createFileShare = async(userId, fileId, permission, expiresDate)=>{
+      console.log(userId, fileId, permission, expiresDate)
       try{
         const response = await fetchWithAuth("http://localhost:5999/api/file/createFileShare",{
           method: "POST",
@@ -117,10 +118,12 @@ export const FileProvider = ({ children }) => {
           })
         })
         const data = await response.json();
+        console.log(data)
             if (response.ok) {
                 setListFileItemShare(data.fileShare)
             } else {
                 alert("Chia sẻ thất bại" + data.message);
+                return;
             }
       }catch(err){
             console.error("❌ Lỗi fetch API:", err);
@@ -198,17 +201,8 @@ export const FileProvider = ({ children }) => {
         }
     };
 
-
-
-
-    // useEffect(() => {
-    //     if (account?.data?.id != null) {
-    //         getListFileParent(rowId);
-    //     }
-    // }, [account?.data?.id, rowId]);
-
-
-
+    
+  
 
     return (
         <UserContext.Provider value={{ listFileParent, getListFileParent, rowId, setRowId,

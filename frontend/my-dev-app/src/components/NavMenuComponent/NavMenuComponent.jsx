@@ -66,6 +66,7 @@ const NavMenuComponent = ({ openItem, onChangeItem }) => {
             <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
               <div className = "bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={{width: TinhDungLuong()}}> {TinhDungLuong()}</div>
             </div>
+            <p className="text-red-500 text-xs">? Chỉ mở trực tiếp file <b>pdf</b> và <b>hình ảnh</b></p>
           </div>
         </div>
       </div>

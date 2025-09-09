@@ -160,14 +160,13 @@ const getFileByKeyPath = async (req, res) => {
       `${process.env.API_SERVER}:3000/get-file?path=${keyPath}`,
       { responseType: "stream" } // Quan trọng để lấy file dạng stream
     );
-        // Lấy tên file từ path
-  //  const filename = keyPath.split(/[/\\]/).pop();
+    
+
     // Copy headers để frontend biết loại file
     res.setHeader("Content-Type", response.headers["content-type"]);
     res.setHeader("Content-Disposition", `inline; filename="${keyPath}"`);
     // // Pipe dữ liệu từ backend 2 về frontend
     response.data.pipe(res);
-
   } catch (err) {
      console.error("Lỗi khi proxy file từ backend 2:",  err.message);
     res.status(500).json({ message: "Không lấy được file từ backend 2" });
@@ -218,12 +217,9 @@ const getFileType = async (req, res) => {
 // }
 const createFileShare = async (req, res) => {
     const { userId, fileId, permission, expiresDate } = req.body;
-    if (req.user.id !== userId) {
-        return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
-    }
     try {
         const result = await FileServices.createFileShare(userId, fileId, permission.trim(), expiresDate);
-        res.json({ message: result.message, fileShare: result.fileShare });
+        res.json({   success: true, message: result.message, fileShare: result.fileShare });
     } catch (error) {
         console.error('Lỗi khi tạo chia sẻ file:', error);
         res.status(500).json({ error: 'Lỗi khi tạo chia sẻ file.', info: error.message });
@@ -268,7 +264,6 @@ const changePermissionFileShare = async (req, res) => {
     const { fileShareId, userId, permission } = req.body;
     try {
         const result = await FileServices.changePermissionFileShare(fileShareId, userId, permission);
-        console.log(result)
         res.json({ message: result.message, fileShare: result.fileShares });
     } catch (error) {
         console.error('Lỗi khi thay đổi quyền chia sẻ file:', error);
@@ -276,43 +271,15 @@ const changePermissionFileShare = async (req, res) => {
     }
 }
 
-const demo = async (req, res) => {
-    try {
-        // Tạo form-data để gửi sang backend 2
-        const form = new FormData();
-        form.append('file', req.file.buffer, {
-            filename: req.file.originalname, // hoặc Date.now() + '.bin'
-            contentType: req.file.mimetype
-        });
-
-        // Gửi sang backend 2
-        const result = await axios.post('http://localhost:3000/demo', form, {
-            headers: form.getHeaders(),
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity
-        });
-
-        res.json({ message: result.data.message });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Lỗi khi gửi file sang Backend2');
-    }
-}
-
-const demo2 = async (req,res) => {
-    const userId = parseInt(req.query.userId);
-    const fileId = parseInt(req.query.fileId);
-
-    // if (req.user.id !== userId) {
-    //     return res.status(403).json({ error: 'Bạn không có quyền truy cập vào tài nguyên này.' });
-    // }
-    try {
-        const result = await FileServices.getUserFile(userId, fileId);
-        res.json({ message: 'lấy file thành công', file: result.file })
-    } catch (error) {
-        console.error('Lỗi khi lấy file: ', error)
-        res.status(500).json({ error: 'Lỗi khi lấy file', info: error.message })
-    }
+const getFileById = async(req, res)=>{
+  const id = parseInt(req.params.id)
+  console.log(id)
+  try{  
+    const result = await FileServices.getFileById(id);
+    res.json({ message: result.message, files: result.files });
+  }catch(err){
+    res.status(500).json({ error: 'Lỗi tải file', info: err.message });
+  }
 }
 
 module.exports = {
@@ -324,6 +291,7 @@ module.exports = {
     createFileShare,
     getFileShare,
     getUserFileShare,
-    changePermissionFileShare, demo,demo2
+    changePermissionFileShare,
+    getFileById
 };
 

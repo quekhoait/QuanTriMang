@@ -4,63 +4,74 @@ import { useUser } from "../../contexts/UserContext";
 
 const FileShareComponent = () => {
   //chứa dữ liệu đang chia sẻ của user hiện hành
-const [permission, setPermission] = useState("view");
+  const [permission, setPermission] = useState("view");
 
-  const {account} = useUser();
-  const { getReceiveFile,getShareFile, changePermissionFileShare} = useFile();
+  const { account } = useUser();
+  const { getReceiveFile, getShareFile, changePermissionFileShare } = useFile();
 
   const [listFileRece, setListFileRece] = useState([]);
 
   const [listFileShare, setListFileShare] = useState([]);
 
-  const getReceiveFiles= async()=>{
+  const getReceiveFiles = async () => {
     const fileReceive = await getReceiveFile(account?.data?.id);
-    if(fileReceive === null){
+    if (fileReceive === null) {
       return;
-    }else{
+    } else {
       setListFileRece(fileReceive);
     }
   }
-  useEffect((e)=>{
+  useEffect((e) => {
     getReceiveFiles();
-    
+
   }, [account?.data?.id])
 
 
-    const getShareFiles= async()=>{
+  const getShareFiles = async () => {
     const fileShare = await getShareFile(account?.data?.id);
-    if(fileShare === null){
+    if (fileShare === null) {
       return;
-    }else{
+    } else {
       setListFileShare(fileShare);
     }
   }
-    useEffect((e)=>{
+  useEffect((e) => {
     getShareFiles();
-    
+
   }, [account?.data?.id])
 
 
-const getDownloadUrl = (url) => {
-  return url.replace('/upload/', '/upload/fl_attachment/');
-};
+  const getDownloadUrl = (url) => {
+    return `http://localhost:5999/api/file/oneFile?path=${url}`;
+  };
 
-const handlePermissionChange = async(index, value) => {
-  const updatedList = [...listFileShare];
-  updatedList[index].permission = value;
-  setListFileShare(updatedList);  
-  const file = updatedList[index]; // Lấy phần tử được chọn
-  try {
-    const result = await changePermissionFileShare(
-      file.id,              // fileId
-      file.sharedToUserId,      // user được chia sẻ
-      file.permission                     // quyền mới
-    );
-    console.log("Cập nhật thành công:", result);
-  } catch (error) {
-    console.error("Lỗi khi cập nhật quyền:", error);
+  const handlePermissionChange = async (index, value) => {
+    const updatedList = [...listFileShare];
+    updatedList[index].permission = value;
+    setListFileShare(updatedList);
+    const file = updatedList[index]; // Lấy phần tử được chọn
+    try {
+      const result = await changePermissionFileShare(
+        file.id,              // fileId
+        file.sharedToUserId,      // user được chia sẻ
+        file.permission                     // quyền mới
+      );
+      console.log("Cập nhật thành công:", result);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật quyền:", error);
+    }
+  };
+  const handlOpenFile = (keyPath, typeFile) => {
+    if (typeFile.includes("image") || typeFile.includes("pdf")) {
+      // Nếu là pdf hoặc img thì mở trực tiếp
+      window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
+    } else {
+      // Nếu không phải thì thông báo confirm
+      if (window.confirm("Không hỗ trợ định dạng này! File sẽ được tải xuống!")) {
+        window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
+      }
+    }
   }
-};
 
 
   return (
@@ -95,21 +106,28 @@ const handlePermissionChange = async(index, value) => {
                     {file.username}
                   </td>
                   <td className="px-3 py-3 max-w-[150px] truncate" title={file.fileName}>
-                    <a href={file.keyPath}  target="_blank" >{file.fileName}</a>
+                    <td className="px-3 py-3 max-w-[150px] truncate " title={file.fileName}>
+                      <span
+                        className="cursor-pointer text-blue-600 hover:underline"
+                        onDoubleClick={() => handlOpenFile(file.keyPath, file.fileType)}
+                      >
+                        {file.fileName}
+                      </span>
+                    </td>
                   </td>
                   <td className="px-3 py-3 max-w-[100px] truncate" title={file.createDate}>
                     {file.createDate}
                   </td>
                   <td className="px-3 py-3 max-w-[200px] truncate">
-  <select
-    className="border px-2 py-1 rounded w-full"
-    value={file.permission}
-    onChange={(e) => handlePermissionChange(index, e.target.value)}
-  >
-    <option value="view">Xem</option>
-    <option value="edit">Chỉnh sửa</option>
-  </select>
-</td>
+                    <select
+                      className="border px-2 py-1 rounded w-full"
+                      value={file.permission}
+                      onChange={(e) => handlePermissionChange(index, e.target.value)}
+                    >
+                      <option value="read">Xem</option>
+                      <option value="edit">Chỉnh sửa</option>
+                    </select>
+                  </td>
 
                 </tr>
               ))}
@@ -145,22 +163,27 @@ const handlePermissionChange = async(index, value) => {
                     {file.email}
                   </td>
                   <td className="px-3 py-3 max-w-[120px] truncate" title={file.name}>
+
                     {file.username}
                   </td>
-                  <td className="px-3 py-3 max-w-[150px] truncate" title={file.fileName}>
-                      <a href={file.keyPath}  target="_blank" >{file.fileName}</a>
+                  <td className="px-3 py-3 max-w-[150px] truncate " title={file.fileName}>
+                    <span
+                      className="cursor-pointer text-blue-600 hover:underline"
+                      onDoubleClick={() => handlOpenFile(file.keyPath, file.fileType)}
+                    >
+                      {file.fileName}
+                    </span>
                   </td>
                   <td className="px-3 py-3 max-w-[100px] truncate" title={file.createDate}>
                     {file.createDate}
                   </td>
-                  <th className="px-3 py-3 max-w-[100px] truncate">
-                    {file.permission === "edit" && (
-                      <a href= {getDownloadUrl(file.keyPath)}>
-                        <i className="fa-solid fa-download cursor-pointer"></i>                 
-                      
+                  <td className="px-3 py-3 max-w-[100px] truncate">
+                    {file.permission?.trim().toLowerCase() === "edit" && (
+                      <a href={getDownloadUrl(file.keyPath)}>
+                        <i className="fa fa-solid fa-download cursor-pointer" ></i>
                       </a>
                     )}
-                  </th>
+                  </td>
                 </tr>
               ))}
             </tbody>
