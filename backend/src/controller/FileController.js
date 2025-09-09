@@ -273,15 +273,15 @@ const changePermissionFileShare = async (req, res) => {
 
 
 const findFileByKeyWord = async (req, res) => {
-    const userId = parseInt(req.query.userId);
-    const keyword = (req.query.keyword || '').trim();
+    const userId = parseInt(req.params.id);
+    const keyword = (req.params.key || '').trim();
 
     if (!keyword) {
         return res.status(400).json({ error: 'Vui lòng nhập từ khóa tìm kiếm.' });
     }
 
     try {
-        const result = await FileServices.findFileByKeyWord(userId, keyword, parentFolderId);
+        const result = await FileServices.findFileByKeyWord(userId, keyword);
         res.json({
             message: 'Tìm kiếm file thành công.',
             files: result.files

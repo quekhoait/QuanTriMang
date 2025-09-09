@@ -411,8 +411,6 @@ const getFileById = async (fileId) => {
 			const request = pool.request();
 			request.input('userId', sql.Int, userId);
 			request.input('keyword', sql.NVarChar, `%${keyword}%`);
-			request.input('parentFolderId', sql.Int, parentFolderId);
-
 			let query = `
 				SELECT * FROM Files
 				WHERE userId = @userId AND fileName LIKE @keyword

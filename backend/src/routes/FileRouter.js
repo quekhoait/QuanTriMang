@@ -32,7 +32,7 @@ router.post('/createFileShare',authMiddleware, createFileShare);
 router.get('/receivedFileShare/:userId',authMiddleware,  getFileShare);
 router.get('/sharedFile/:userId',authMiddleware,  getUserFileShare);
 router.put('/changePermissionFileShare', changePermissionFileShare);
-router.get('/find-by-name', findFileByKeyWord);
+router.get('/find-by-name/:id/:key', findFileByKeyWord);
 
 
 

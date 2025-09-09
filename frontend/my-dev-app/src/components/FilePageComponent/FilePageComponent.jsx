@@ -7,8 +7,11 @@ import { FormShareComponent } from "../FormShareComponent/FormShareComponent";
 import { fetchWithAuth } from "../../utils/authFetch";
 import { IoDocumentText } from "react-icons/io5";
 import { ClipLoader } from "react-spinners";
+import { useLocation } from "react-router-dom";
 
 export default function FilePageComponent({ listFiles, isAllFile, fileName, rowId, setRowId }) {
+
+
     //listFiles json dữ liệu tệp tin lấy api/file/listFile/:userId/:parentFolderId
     const { getListFileParent,  removeFile } = useFile();
     //Tạo thêm folder mới
@@ -38,6 +41,9 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     useEffect(() => {
         setlistFile(listFiles)
     }, [listFiles])
+       const location = useLocation();
+  const { listFilesSearch } = location.state || { listFilesSearch: [] };
+const filesToRender = listFilesSearch.length > 0 ? listFilesSearch : listFile;
 
     const currentDate = new Date().toLocaleDateString("en-US", {
         month: "short",
@@ -507,7 +513,8 @@ const handelDownload = () => {
                                     <td className="p-2">-</td>
                                 </tr>
                             )}
-                            {listFile.map((file, i) => {
+                            
+                            {filesToRender.map((file, i) => {
                                 return (
                                     <tr
                                         key={i}
