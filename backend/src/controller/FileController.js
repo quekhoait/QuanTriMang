@@ -271,6 +271,29 @@ const changePermissionFileShare = async (req, res) => {
     }
 }
 
+
+const findFileByKeyWord = async (req, res) => {
+    const userId = parseInt(req.query.userId);
+    const keyword = (req.query.keyword || '').trim();
+
+    if (!keyword) {
+        return res.status(400).json({ error: 'Vui lòng nhập từ khóa tìm kiếm.' });
+    }
+
+    try {
+        const result = await FileServices.findFileByKeyWord(userId, keyword, parentFolderId);
+        res.json({
+            message: 'Tìm kiếm file thành công.',
+            files: result.files
+        });
+    } catch (error) {
+        console.error('Lỗi khi tìm kiếm file:', error);
+        res.status(500).json({ error: 'Lỗi khi tìm kiếm file.', info: error.message });
+    }
+};
+
+
+
 const getFileById = async(req, res)=>{
   const id = parseInt(req.params.id)
   console.log(id)
@@ -280,7 +303,11 @@ const getFileById = async(req, res)=>{
   }catch(err){
     res.status(500).json({ error: 'Lỗi tải file', info: err.message });
   }
+
 }
+
+
+
 
 module.exports = {
     createFile,
@@ -292,6 +319,9 @@ module.exports = {
     getFileShare,
     getUserFileShare,
     changePermissionFileShare,
-    getFileById
+    getFileById,
+
+    findFileByKeyWord
+
 };
 
