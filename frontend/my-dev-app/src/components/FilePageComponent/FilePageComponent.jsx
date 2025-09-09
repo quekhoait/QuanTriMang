@@ -352,8 +352,10 @@ const handelDownload = () => {
     }
 
     //Mở file
-    const handlOpenFile = (keyPath, typeFile) => {
-        if (typeFile.includes("image") || typeFile.includes("pdf")) {
+    const handlOpenFile = (keyPath, typeFile, isFolder) => {
+      console.log(isFolder)
+        if(!isFolder){
+          if (typeFile.includes("image") || typeFile.includes("pdf")) {
             // Nếu là pdf hoặc img thì mở trực tiếp
             window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
         } else {
@@ -362,8 +364,8 @@ const handelDownload = () => {
                 window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
             }
         }
+        }
     }
-
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     useEffect(() => {
@@ -382,6 +384,8 @@ const handelDownload = () => {
 
         fetchData();
     }, []);
+
+    
 
     return (
         <div className="p-6 relative">
@@ -551,7 +555,7 @@ const handelDownload = () => {
                                                 />
                                             ) : (
                                                 <a
-                                                    onDoubleClick={() => handlOpenFile(file.keyPath, file.fileType)}
+                                                    onDoubleClick={() => handlOpenFile(file.keyPath, file.fileType, file.isFolder)}
                                                     target="_blank"
                                                 >
                                                     {file.fileName}

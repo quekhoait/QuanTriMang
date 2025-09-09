@@ -66,6 +66,7 @@ export const FileProvider = ({ children }) => {
           credentials: 'include'
         })
         const data = await response.json();
+        console.log(data.file)
         if(response.ok){
           setListFileType(data.file)
         }else{

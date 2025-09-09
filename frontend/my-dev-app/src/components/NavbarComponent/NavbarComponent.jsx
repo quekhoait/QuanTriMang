@@ -7,6 +7,7 @@ const NavbarComponent = () => {
     const [isOpen, setIsOpen] = useState(false);    
     const {account, getUser} = useUser();
 
+
     const navigate = useNavigate();
 
     const handleProfile = ()=>{
@@ -40,6 +41,11 @@ const NavbarComponent = () => {
       }catch(err){
         alert("Lỗi đăng xuất" + err.message)
       }
+    }
+
+    //Tìm kiems file
+    const handleLookForFile = (value)=>{
+
     }
 
   return (

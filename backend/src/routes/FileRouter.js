@@ -10,8 +10,8 @@ const {
     getFileShare,
     getUserFileShare,
     changePermissionFileShare,
-    demo,
-    demo2
+    findFileByKeyWord,
+
 
 } = require('../controller/FileController');
 
@@ -32,8 +32,7 @@ router.post('/createFileShare',authMiddleware, createFileShare);
 router.get('/receivedFileShare/:userId',authMiddleware,  getFileShare);
 router.get('/sharedFile/:userId',authMiddleware,  getUserFileShare);
 router.put('/changePermissionFileShare', changePermissionFileShare);
-router.post('/demo',upload.single('file'), demo);
-router.get('/demo2',demo2);
+router.get('/find-by-name', findFileByKeyWord);
 
 
 
