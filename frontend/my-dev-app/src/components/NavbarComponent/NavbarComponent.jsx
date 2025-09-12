@@ -58,7 +58,7 @@ const NavbarComponent = () => {
       const data = await response.json();
       if (response.ok) {
         setListFilesSearch(data.files);
-
+    
       } else {
         setListFilesSearch([])
       }
@@ -67,12 +67,11 @@ const NavbarComponent = () => {
       }
     } catch (err) {
       alert("Lỗi server" + err.message)
+    }finally{
+          navigate("/", { state: { listFilesSearch } });
     }
   }
-
-  useEffect(() => {
-    navigate("/", { state: { listFilesSearch } });
-  }, [listFilesSearch])
+  
 
   return (
     <div className="bg-white py-[16px]  w-[100%] flex items-center justify-center shadow-md fixed">

@@ -89,7 +89,7 @@ export default function SignInPage() {
           <div className="relative">
             <label className="block mb-1 text-white text-left">Mật khẩu</label>
             <input
-              type={!eye ? 'text' : "password"}
+              type={eye ? 'text' : "password"}
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
               placeholder="Nhập mật khẩu"
               value={password}

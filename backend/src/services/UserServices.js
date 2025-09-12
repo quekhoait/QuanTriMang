@@ -1,3 +1,4 @@
+const { DateTime } = require("mssql");
 const { pool } = require("../../db");
 const bcrypt = require('bcrypt');
 
@@ -34,8 +35,9 @@ const createUser = (newUser) => {
           .input("email", newUser.email)
           .input("username", newUser.username)
           .input("password", newUser.password)
+          .input("createDate", new DateTime() )
           .input("avatar","http://localhost:5999/uploads/avatar/user.png" )
-          .query("INSERT INTO Account (email, username, password, avatar) VALUES (@email, @username, @password, @avatar)");
+          .query("INSERT INTO Account (email, username, password, createDate, avatar) VALUES (@email, @username, @password, @createDate, @avatar)");
 
         return resolve({
           status: "SUCCESS",

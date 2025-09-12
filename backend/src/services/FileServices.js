@@ -215,15 +215,10 @@
 						loopRequest.input("id", sql.Int, id);
 
 						const fileInfo = await loopRequest.query("select keypath from files where userId = @userId and id = @id")
-						// //cloudinary
-						// if (fileInfo.recordset.length > 0 && fileInfo.recordset[0].publicId && fileInfo.recordset[0].publicId.trim() !== "") {
-						// 	await deleteCloudinaryFile(fileInfo.recordset[0].publicId)
-						// }
-						console.log('DEBUG fileInfo:', fileInfo.recordset);
+	
 						// NAS
 
 						const keyPath = fileInfo.recordset[0].keypath;
-						console.log(keyPath);
 
 						// Gửi request tới API xóa file vật lý (NAS)
 						if (fileInfo.recordset.length > 0 && fileInfo.recordset[0].keypath) {

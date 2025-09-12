@@ -43,7 +43,7 @@ export default function FilePageComponent({ listFiles, isAllFile, fileName, rowI
     }, [listFiles])
        const location = useLocation();
   const { listFilesSearch } = location.state || { listFilesSearch: [] };
-const filesToRender = listFilesSearch.length > 0 ? listFilesSearch : listFile;
+  const filesToRender = listFilesSearch.length > 0 ? listFilesSearch : listFile;
 
     const currentDate = new Date().toLocaleDateString("en-US", {
         month: "short",
@@ -374,6 +374,7 @@ const handelDownload = () => {
     }
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);

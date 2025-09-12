@@ -105,7 +105,7 @@ const SigUpPage = () => {
                 <div className="relative">
                 <label className="block mb-1 text-white text-left">Mật khẩu</label>
                 <input
-                  type={!eye1 ? 'text' : "password"}
+                  type={eye1 ? 'text' : "password"}
                   className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
                   placeholder="Nhập mật khẩu"
                   value={password}
@@ -117,7 +117,7 @@ const SigUpPage = () => {
               </div>   <div className="relative">
                 <label className="block mb-1 text-white text-left">Xác nhận Mật khẩu</label>
                 <input
-                  type={!eye2 ? 'text' : "password"}
+                  type={eye2 ? 'text' : "password"}
                   className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 pr-[46px]"
                   placeholder="Nhập mật khẩu"
                   value={confirmPassWord}
