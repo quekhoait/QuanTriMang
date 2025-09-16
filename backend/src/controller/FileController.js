@@ -81,7 +81,7 @@ const createFile = async (req, res) => {
         let result; 
         try {
             // Gửi sang backend 2
-            result = await axios.post(`${process.env.API_SERVER}:3000/upload?userId=${userId}`, form, {
+            result = await axios.post(`${process.env.API_SERVER}/upload?userId=${userId}`, form, {
                 headers: form.getHeaders(),
                 maxContentLength: Infinity,
                 maxBodyLength: Infinity
@@ -157,7 +157,7 @@ const getFileByKeyPath = async (req, res) => {
     const keyPath  = req.query.path;
     // Gọi sang backend 2 để lấy file
     const response = await axios.get(
-      `${process.env.API_SERVER}:3000/get-file?path=${keyPath}`,
+      `${process.env.API_SERVER}/get-file?path=${keyPath}`,
       { responseType: "stream" } // Quan trọng để lấy file dạng stream
     );
     

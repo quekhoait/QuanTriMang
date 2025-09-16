@@ -48,43 +48,25 @@ const uploadFile = async (req, res) => {
 
 const getFileByKey = async (req, res) => {
   try {
-    let filePath = req.query.path;
+    let filePath =  req.query.path; 
     if (!filePath) return res.status(400).json({ message: "Missing path" });
 
-    // Chuẩn hóa đường dẫn
-    filePath = path.normalize(filePath.replace(/\\/g, "/"));
+    // Chuyển \ thành / để tránh lỗi khi gọi từ Windows
+    filePath = filePath.replace(/\\/g, "/");
+
+    filePath = path.normalize(filePath);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const ext = path.extname(filePath).toLowerCase();
-    const mimeType = mime.getType(filePath) || "application/octet-stream";
-
-    // 🔹 Nếu là file Office thì convert sang PDF
-    if ([".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"].includes(ext)) {
-      const file = fs.readFileSync(filePath);
-      libre.convert(file, ".pdf", undefined, (err, done) => {
-        if (err) {
-          console.error("Convert error:", err);
-          return res.status(500).send("Cannot convert file to PDF");
-        }
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "inline");
-        res.send(done);
-      });
-      return;
-    }
-
-    // 🔹 Các loại khác → trả về trực tiếp
-    res.setHeader("Content-Type", mimeType);
-    res.setHeader("Content-Disposition", "inline");
     res.sendFile(filePath);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error reading file" });
   }
-};
+}
+    
 
 const deleteFileByPath = async (req, res) => {
 	try {

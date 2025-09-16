@@ -224,7 +224,7 @@
 						if (fileInfo.recordset.length > 0 && fileInfo.recordset[0].keypath) {
 							try {
 								const apiServer = process.env.API_SERVER || 'http://localhost'; // fallback nếu biến môi trường chưa set
-								await axios.delete(`${apiServer}:3000/delete-file`, {
+								await axios.delete(`${apiServer}/delete-file`, {
 									params: { path: keyPath }
 								});
 							} catch (deleteFileError) {
