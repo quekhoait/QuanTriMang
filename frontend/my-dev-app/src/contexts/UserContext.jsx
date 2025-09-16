@@ -16,7 +16,7 @@ export const UserProvider = ({children})=>{
             if(!token){
             return;
             }
-        const response = await fetch("http://localhost:5999/api/user/get-user",{
+        const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/user/get-user`,{
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -27,7 +27,7 @@ export const UserProvider = ({children})=>{
             const dataUser = await response.json();
             setAccount(dataUser)
         }else{
-            const responseRef = await fetch("http://localhost:5999/api/user/refreshToken",{
+            const responseRef = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/user/refreshToken`,{
                 method: 'POST',
                 credentials: 'include', // RẤT QUAN TRỌNG
             });
@@ -57,7 +57,7 @@ useEffect(() => {
 
   const getUserByEmail = async(email)=>{
         try{
-        const response = await fetch(`http://localhost:5999/api/user/getUserEmail/${email}`,{
+        const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/user/getUserEmail/${email}`,{
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

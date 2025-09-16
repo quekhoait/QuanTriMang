@@ -33,7 +33,7 @@ export default function SignInPage() {
     const handleSubmitSigIn = async(e)=>{
       e.preventDefault();
       try{
-        const response = await fetch('http://localhost:5999/api/user/login', {
+        const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/user/login`, {
           method: "POST",
           headers: {
             'Content-Type': 'application/json'

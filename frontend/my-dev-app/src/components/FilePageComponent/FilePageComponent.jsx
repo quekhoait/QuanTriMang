@@ -151,7 +151,7 @@ setListFileId(prev=>prev.filter(item=>item!==id));
     const token = localStorage.getItem('accessToken');
     const createFolder = async () => {
         try {
-            const response = await fetchWithAuth('http://localhost:5999/api/file/upload', {
+            const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/upload`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -247,7 +247,7 @@ setListFileId(prev=>prev.filter(item=>item!==id));
         formData.append("parentFolderId", rowId);
         setIsUploading(true);
         try {
-            const response = await fetchWithAuth('http://localhost:5999/api/file/upload', {
+            const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/upload`, {
                 method: "POST",
                 headers: {
                     'Authorization': 'Bearer ' + token
@@ -312,7 +312,7 @@ setListFileId(prev=>prev.filter(item=>item!==id));
     const getFileById = async(id)=>{
 
       try{
-        const response = await fetch(`http://localhost:5999/api/file/getFileById/${id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/file/getFileById/${id}`, {
           method: "GET",
           headers: {
               "Content-Type": "application/json",
@@ -334,7 +334,7 @@ useEffect(() => {
     listFileDownload.forEach((file, index) => {
       setTimeout(() => {
         const link = document.createElement("a");
-        link.href = `http://localhost:5999/api/file/oneFile?path=${file.keyPath}`;
+        link.href = `${process.env.REACT_APP_API_FRONTEND}/api/file/oneFile?path=${file.keyPath}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -363,11 +363,11 @@ const handelDownload = () => {
         if(!isFolder){
           if (typeFile.includes("image") || typeFile.includes("pdf")) {
             // Nếu là pdf hoặc img thì mở trực tiếp
-            window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
+            window.open(`${process.env.REACT_APP_API_FRONTEND}/api/file/oneFile?path=${keyPath}`, "_blank");
         } else {
             // Nếu không phải thì thông báo confirm
             if (window.confirm("Không hỗ trợ định dạng này! File sẽ được tải xuống!")) {
-                window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
+                window.open(`${process.env.REACT_APP_API_FRONTEND}/api/file/oneFile?path=${keyPath}`, "_blank");
             }
         }
         }
@@ -379,7 +379,7 @@ const handelDownload = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const res = await fetch("http://localhost:5999/api/files");
+                const res = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/files`);
                 const json = await res.json();
                 setData(json);
             } catch (err) {

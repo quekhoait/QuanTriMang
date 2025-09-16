@@ -116,7 +116,7 @@ const updateUser = async(req, res)=>{
         const data = req.body;
         const file = req.file;
         if(file){
-            data.avatar = `http://localhost:5999/uploads/avatar/${file.filename}`;
+            data.avatar = `${process.env.API_BACKEND}/uploads/avatar/${file.filename}`;
         }
         if(!userId){
             return res.status(200).json({

@@ -74,7 +74,7 @@ const ProfilePage = () => {
       if (selectFileImage) {
         formData.append('avatar', selectFileImage)
       }
-      const response = await fetch(`http://localhost:5999/api/user/update/${account?.data?.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/user/update/${account?.data?.id}`, {
         method: "PUT",
         body: formData
       })

@@ -24,7 +24,7 @@ export const FileProvider = ({ children }) => {
     const getListFileParent = async (rowId) => {  
         const parentFolderId = rowId === undefined ? null : rowId;
         try {
-            const response = await fetchWithAuth(`http://localhost:5999/api/file/listFile/${userId}/${parentFolderId === null ? 'NULL' : rowId}`, {
+            const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/listFile/${userId}/${parentFolderId === null ? 'NULL' : rowId}`, {
                 method: "GET",
                 headers: {
                   'Authorization': 'Bearer ' + token,
@@ -58,7 +58,7 @@ export const FileProvider = ({ children }) => {
 
     const getFileType = async(type)=>{
       try{
-        const response = await fetchWithAuth(`http://localhost:5999/api/file/getFileType/${userId}/${type}`,{
+        const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/getFileType/${userId}/${type}`,{
           method: "GET",
           headers: {
                   'Authorization': 'Bearer ' + token,
@@ -79,7 +79,7 @@ export const FileProvider = ({ children }) => {
 
     const removeFile = async (listFileId) => {
         try {
-            const response = await fetchWithAuth("http://localhost:5999/api/file/deleteFile", {
+            const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/deleteFile`, {
                 method: "DELETE",
                 headers: {
                   'Authorization': 'Bearer ' + token,
@@ -108,7 +108,7 @@ export const FileProvider = ({ children }) => {
     const createFileShare = async(userId, fileId, permission, expiresDate)=>{
       console.log(userId, fileId, permission, expiresDate)
       try{
-        const response = await fetchWithAuth("http://localhost:5999/api/file/createFileShare",{
+        const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/createFileShare`,{
           method: "POST",
           headers:{"Content-Type": "application/json",
             'Authorization': 'Bearer ' + token,
@@ -136,7 +136,7 @@ export const FileProvider = ({ children }) => {
 
     const getReceiveFile = async(id)=>{
       try{
-        const response = await fetchWithAuth(`http://localhost:5999/api/file/receivedFileShare/${id}`,{
+        const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/receivedFileShare/${id}`,{
           method: "GET",
           credentials: 'include',
             headers: {
@@ -158,7 +158,7 @@ export const FileProvider = ({ children }) => {
 
         const getShareFile = async(id)=>{
       try{
-        const response = await fetchWithAuth(`http://localhost:5999/api/file/sharedFile/${id}`,{
+        const response = await fetchWithAuth(`${process.env.REACT_APP_API_FRONTEND}/api/file/sharedFile/${id}`,{
           method: "GET",
           credentials: 'include',
             headers: {
@@ -178,7 +178,7 @@ export const FileProvider = ({ children }) => {
 
       const changePermissionFileShare = async (fileShareId, userId, permission) => {
         try {
-            const response = await fetch("http://localhost:5999/api/file/changePermissionFileShare", {
+            const response = await fetch( `${process.env.REACT_APP_API_FRONTEND}/api/file/changePermissionFileShare`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

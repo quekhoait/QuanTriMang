@@ -28,7 +28,7 @@ const NavbarComponent = () => {
   //Đăng xuất user
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:5999/api/user/logout', {
+      const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/user/logout`, {
         method: "POST",
         headers: {
           'Contet-Type': 'application/json'
@@ -49,7 +49,7 @@ const NavbarComponent = () => {
   const [keyword, setKeyword] = useState()
   const handleSearchFile = async (id, key) => {
     try {
-      const response = await fetch(`http://localhost:5999/api/file/find-by-name/${id}/${key}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/file/find-by-name/${id}/${key}`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json'

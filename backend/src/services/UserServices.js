@@ -36,7 +36,7 @@ const createUser = (newUser) => {
           .input("username", newUser.username)
           .input("password", newUser.password)
           .input("createDate", new DateTime() )
-          .input("avatar","http://localhost:5999/uploads/avatar/user.png" )
+          .input("avatar",`${process.env.API_BACKEND}/uploads/avatar/user.png`)
           .query("INSERT INTO Account (email, username, password, createDate, avatar) VALUES (@email, @username, @password, @createDate, @avatar)");
 
         return resolve({

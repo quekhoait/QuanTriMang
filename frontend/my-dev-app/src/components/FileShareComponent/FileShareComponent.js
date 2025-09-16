@@ -42,7 +42,7 @@ const FileShareComponent = () => {
 
 
   const getDownloadUrl = (url) => {
-    return `http://localhost:5999/api/file/oneFile?path=${url}`;
+    return `${process.env.REACT_APP_API_FRONTEND}/api/file/oneFile?path=${url}`;
   };
 
   const handlePermissionChange = async (index, value) => {
@@ -64,11 +64,11 @@ const FileShareComponent = () => {
   const handlOpenFile = (keyPath, typeFile) => {
     if (typeFile.includes("image") || typeFile.includes("pdf")) {
       // Nếu là pdf hoặc img thì mở trực tiếp
-      window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
+      window.open(`${process.env.REACT_APP_API_FRONTEND}/api/file/oneFile?path=${keyPath}`, "_blank");
     } else {
       // Nếu không phải thì thông báo confirm
       if (window.confirm("Không hỗ trợ định dạng này! File sẽ được tải xuống!")) {
-        window.open(`http://localhost:5999/api/file/oneFile?path=${keyPath}`, "_blank");
+        window.open(`${process.env.REACT_APP_API_FRONTEND}/api/file/oneFile?path=${keyPath}`, "_blank");
       }
     }
   }

@@ -39,7 +39,7 @@ const SigUpPage = () => {
       }
       setError('');
       try{  
-        const response = await fetch("http://localhost:5999/api/user/create",{
+        const response = await fetch(`${process.env.REACT_APP_API_FRONTEND}/api/user/create`,{
           method: "POST",
           headers: {
             'Content-Type': 'application/json',
