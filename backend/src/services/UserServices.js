@@ -35,7 +35,7 @@ const createUser = (newUser) => {
           .input("email", newUser.email)
           .input("username", newUser.username)
           .input("password", newUser.password)
-          .input("createDate", new DateTime() )
+          .input("createDate", new Date())
           .input("avatar",`${process.env.API_BACKEND}/uploads/avatar/user.png`)
           .query("INSERT INTO Account (email, username, password, createDate, avatar) VALUES (@email, @username, @password, @createDate, @avatar)");
 
