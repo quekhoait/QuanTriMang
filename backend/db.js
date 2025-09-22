@@ -11,7 +11,7 @@ var config = {
     database: process.env.DB_DATABASE,
     port: parseInt(process.env.DB_PORT),
     options: {
-        encrypt: false ,// Disable encryption
+        encrypt: true ,// Disable encryption
         trustServerCertificate: true
     }
 }

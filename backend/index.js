@@ -5,14 +5,15 @@ const path = require('path')
 const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 5999;
+const PORT = process.env.PORT || 5999;
+
 
 
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 const cors = require('cors'); //kết nối db
 app.use(cors({
-  origin: 'http://localhost:3000', // React app
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true
 }));
 
@@ -36,6 +37,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server đang chạy tại http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
+
 
